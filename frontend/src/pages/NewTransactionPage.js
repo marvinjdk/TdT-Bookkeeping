@@ -191,12 +191,12 @@ export default function NewTransactionPage() {
               {file && <p className="text-sm text-slate-600 mt-1">Valgt fil: {file.name}</p>}
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 type="submit"
                 data-testid="submit-button"
                 disabled={loading || uploadingFile}
-                className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95"
+                className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95 w-full sm:w-auto"
               >
                 {loading || uploadingFile ? (
                   uploadingFile ? 'Uploader kvittering...' : 'Gemmer...'
@@ -212,7 +212,7 @@ export default function NewTransactionPage() {
                 variant="outline"
                 onClick={() => navigate('/transactions')}
                 data-testid="cancel-button"
-                className="border-slate-200 hover:bg-slate-50"
+                className="border-slate-200 hover:bg-slate-50 w-full sm:w-auto"
               >
                 Annuller
               </Button>
