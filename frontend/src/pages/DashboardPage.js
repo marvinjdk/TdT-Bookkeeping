@@ -11,20 +11,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { TrendingUp, TrendingDown, FileText, Wallet, Users as UsersIcon, Plus, Key } from 'lucide-react';
 import { toast } from 'sonner';
 
-const AFDELINGER = [
-  'Himmerland',
-  'Vest- & Sydsjælland',
-  'Syd/Sønderjylland & Fyn',
-  'Øst- & Midtjylland',
-  'Hovedstaden, Barcelona-Paris',
-  'Nordsjælland & Hovedstadsområdet',
-  'Explore',
-];
-
 export default function DashboardPage({ user }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
+  const [afdelinger, setAfdelinger] = useState([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -41,6 +32,7 @@ export default function DashboardPage({ user }) {
   useEffect(() => {
     if (isSuperbruger) {
       fetchUsers();
+      fetchAfdelinger();
     } else {
       fetchStats();
     }
