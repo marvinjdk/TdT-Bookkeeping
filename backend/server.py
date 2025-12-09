@@ -53,6 +53,15 @@ class UserPasswordUpdate(BaseModel):
 class UserAfdelingUpdate(BaseModel):
     afdeling_navn: str
 
+class AfdelingCreate(BaseModel):
+    navn: str
+
+class Afdeling(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    navn: str
+    oprettet: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
