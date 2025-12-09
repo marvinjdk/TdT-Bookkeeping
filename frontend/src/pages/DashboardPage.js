@@ -119,15 +119,17 @@ export default function DashboardPage({ user }) {
           <CardContent>
             <div className="space-y-3">
               {stats.afdelinger_saldi.map((afd) => (
-                <div 
+                <button
                   key={afd.afdeling_id}
-                  className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                  onClick={() => navigate(`/transactions?afdeling_id=${afd.afdeling_id}`)}
+                  className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+                  data-testid={`view-hold-${afd.afdeling_id}`}
                 >
                   <span className="font-medium text-slate-700">{afd.afdeling_navn}</span>
                   <span className={`font-bold font-data text-lg ${afd.aktuelt_saldo >= 0 ? 'text-[#109848]' : 'text-red-600'}`}>
                     {afd.aktuelt_saldo.toFixed(2)} kr.
                   </span>
-                </div>
+                </button>
               ))}
             </div>
           </CardContent>
