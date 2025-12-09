@@ -90,16 +90,16 @@ export default function TransactionsPage({ user }) {
   }
 
   return (
-    <div className="p-6 md:p-8 lg:p-12 space-y-8" data-testid="transactions-page">
-      <div className="flex items-center justify-between">
+    <div className="p-4 md:p-6 lg:p-12 space-y-6" data-testid="transactions-page">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight">Posteringer</h1>
-          <p className="text-lg text-slate-600 mt-2">Administrer dine bogføringsposteringer</p>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">Posteringer</h1>
+          <p className="text-base md:text-lg text-slate-600 mt-2">Administrer dine bogføringsposteringer</p>
         </div>
         <Button
           onClick={() => navigate('/transactions/new')}
           data-testid="new-transaction-button"
-          className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95"
+          className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95 w-full sm:w-auto"
         >
           <Plus size={18} className="mr-2" />
           Ny postering
