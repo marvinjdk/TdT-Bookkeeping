@@ -69,11 +69,12 @@ class SettingsModel(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     afdeling_id: str
     startsaldo: float = 0.0
-    periode_start: str = "01-10"
-    periode_slut: str = "30-09"
+    periode_start: str = "01-10-2024"
+    periode_slut: str = "30-09-2025"
+    regnskabsaar: str = "2024-2025"
+    naeste_bilagnr: int = 1
 
 class TransactionCreate(BaseModel):
-    bilagnr: str
     bank_dato: str
     tekst: str
     formal: str
