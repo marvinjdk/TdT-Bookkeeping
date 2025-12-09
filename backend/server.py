@@ -59,6 +59,11 @@ class Token(BaseModel):
     token_type: str
     user: User
 
+class SettingsUpdate(BaseModel):
+    startsaldo: float = 0.0
+    periode_start: str = "01-10"
+    periode_slut: str = "30-09"
+
 class SettingsModel(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
