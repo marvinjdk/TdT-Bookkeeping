@@ -58,9 +58,9 @@ export default function SettingsPage({ user }) {
 
   if (user.role !== 'afdeling') {
     return (
-      <div className="p-6 md:p-8 lg:p-12" data-testid="settings-page">
-        <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight">Indstillinger</h1>
-        <p className="text-lg text-slate-600 mt-2">Kun tilgængelig for afdelinger</p>
+      <div className="p-4 md:p-6 lg:p-12" data-testid="settings-page">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">Indstillinger</h1>
+        <p className="text-base md:text-lg text-slate-600 mt-2">Kun tilgængelig for afdelinger</p>
       </div>
     );
   }
