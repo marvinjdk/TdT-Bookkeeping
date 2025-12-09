@@ -389,22 +389,111 @@ async def export_excel(
     afdeling_id: Optional[str] = None,
     current_user: User = Depends(get_current_user)
 ):
-    query = {}
-    if current_user.role == "afdeling":
-        query["afdeling_id"] = current_user.id
-    elif current_user.role == "admin" and afdeling_id:
-        query["afdeling_id"] = afdeling_id
+    wb = Workbook()
     
+    # If admin and no specific afdeling_id, export all with separate sheets
+    if current_user.role == "admin" and not afdeling_id:
+        # Get all afdelinger
+        afdelinger = await db.users.find({"role": "afdeling"}, {"_id": 0}).to_list(100)
+        
+        # Remove default sheet
+        wb.remove(wb.active)
+        
+        # Create sheet for each afdeling
+        all_transactions = []
+        for afdeling in afdelinger:
+            await create_afdeling_sheet(wb, afdeling["id"], afdeling["afdeling_navn"])
+            
+            # Collect for combined sheet
+            projection = {
+                "_id": 0, "bilagnr": 1, "bank_dato": 1, 
+                "tekst": 1, "formal": 1, "belob": 1, "type": 1, "afdeling_id": 1
+            }
+            trans = await db.transactions.find(
+                {"afdeling_id": afdeling["id"]}, projection
+            ).sort("bank_dato", 1).to_list(10000)
+            
+            for t in trans:
+                t["afdeling_navn"] = afdeling["afdeling_navn"]
+                all_transactions.append(t)
+        
+        # Create combined sheet
+        ws_combined = wb.create_sheet("Alle hold")
+        ws_combined.append(["Hold", "Bilagnr.", "Bank dato", "Tekst", "Formål", "Beløb", "Type"])
+        
+        # Style headers
+        header_fill = PatternFill(start_color="109848", end_color="109848", fill_type="solid")
+        header_font = Font(bold=True, color="FFFFFF")
+        for cell in ws_combined[1]:
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal="center")
+        
+        # Sort all by date and add data
+        all_transactions.sort(key=lambda x: x["bank_dato"])
+        for t in all_transactions:
+            ws_combined.append([
+                t["afdeling_navn"],
+                t["bilagnr"],
+                t["bank_dato"],
+                t["tekst"],
+                t["formal"],
+                t["belob"],
+                t["type"]
+            ])
+        
+        auto_adjust_columns(ws_combined)
+    else:
+        # Single afdeling export
+        target_afdeling_id = current_user.id if current_user.role == "afdeling" else afdeling_id
+        
+        # Get afdeling name
+        afdeling_user = await db.users.find_one({"id": target_afdeling_id}, {"_id": 0})
+        afdeling_navn = afdeling_user.get("afdeling_navn", "Bogføring") if afdeling_user else "Bogføring"
+        
+        wb.remove(wb.active)
+        await create_afdeling_sheet(wb, target_afdeling_id, afdeling_navn)
+    
+    # Save to bytes
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=tour_de_taxa_bogforing.xlsx"}
+    )
+
+async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn):
+    """Create a sheet for a specific afdeling with startsaldo and aktuel saldo"""
+    ws = wb.create_sheet(afdeling_navn[:31])  # Excel sheet name limit is 31 chars
+    
+    # Get settings for startsaldo
+    settings = await db.settings.find_one({"afdeling_id": afdeling_id}, {"_id": 0})
+    startsaldo = settings.get("startsaldo", 0.0) if settings else 0.0
+    
+    # Get transactions
     projection = {
         "_id": 0, "bilagnr": 1, "bank_dato": 1, 
         "tekst": 1, "formal": 1, "belob": 1, "type": 1
     }
-    transactions = await db.transactions.find(query, projection).sort("bank_dato", 1).to_list(10000)
+    transactions = await db.transactions.find(
+        {"afdeling_id": afdeling_id}, projection
+    ).sort("bank_dato", 1).to_list(10000)
     
-    # Create Excel workbook
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Bogføring"
+    # Calculate sums
+    total_indtaegter = sum(t["belob"] for t in transactions if t["type"] == "indtaegt")
+    total_udgifter = sum(t["belob"] for t in transactions if t["type"] == "udgift")
+    aktuel_saldo = startsaldo + total_indtaegter - total_udgifter
+    
+    # Add startsaldo row
+    ws.append(["Startsaldo", "", "", "", startsaldo, ""])
+    ws[1][0].font = Font(bold=True)
+    ws[1][4].font = Font(bold=True)
+    
+    # Add empty row
+    ws.append([])
     
     # Headers
     headers = ["Bilagnr.", "Bank dato", "Tekst", "Formål", "Beløb", "Type"]
@@ -413,7 +502,8 @@ async def export_excel(
     # Style headers
     header_fill = PatternFill(start_color="109848", end_color="109848", fill_type="solid")
     header_font = Font(bold=True, color="FFFFFF")
-    for cell in ws[1]:
+    header_row = ws[3]
+    for cell in header_row:
         cell.fill = header_fill
         cell.font = header_font
         cell.alignment = Alignment(horizontal="center")
@@ -429,7 +519,19 @@ async def export_excel(
             t["type"]
         ])
     
-    # Auto-adjust column widths
+    # Add empty row
+    ws.append([])
+    
+    # Add aktuel saldo row
+    last_row = ws.max_row + 1
+    ws.append(["Aktuel saldo", "", "", "", aktuel_saldo, ""])
+    ws[last_row][0].font = Font(bold=True, color="109848")
+    ws[last_row][4].font = Font(bold=True, color="109848")
+    
+    auto_adjust_columns(ws)
+
+def auto_adjust_columns(ws):
+    """Auto-adjust column widths"""
     for column in ws.columns:
         max_length = 0
         column_letter = column[0].column_letter
@@ -441,17 +543,6 @@ async def export_excel(
                 pass
         adjusted_width = min(max_length + 2, 50)
         ws.column_dimensions[column_letter].width = adjusted_width
-    
-    # Save to bytes
-    output = io.BytesIO()
-    wb.save(output)
-    output.seek(0)
-    
-    return StreamingResponse(
-        output,
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": "attachment; filename=bogforing.xlsx"}
-    )
 
 # Include router
 app.include_router(api_router)
