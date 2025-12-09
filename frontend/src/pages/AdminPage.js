@@ -89,6 +89,31 @@ export default function AdminPage({ user }) {
     }
   };
 
+  const handleOpenPasswordDialog = (user) => {
+    setSelectedUser(user);
+    setNewPassword('');
+    setShowPasswordDialog(true);
+  };
+
+  const handleChangePassword = async () => {
+    if (!newPassword || newPassword.length < 6) {
+      toast.error('Password skal være mindst 6 tegn');
+      return;
+    }
+
+    try {
+      await api.put(`/admin/users/${selectedUser.id}/password`, {
+        new_password: newPassword,
+      });
+      toast.success('Password ændret!');
+      setShowPasswordDialog(false);
+      setSelectedUser(null);
+      setNewPassword('');
+    } catch (error) {
+      toast.error('Kunne ikke ændre password');
+    }
+  };
+
   const viewAfdelingTransactions = (afdelingId) => {
     navigate(`/transactions?afdeling_id=${afdelingId}`);
   };
