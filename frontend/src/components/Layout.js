@@ -49,16 +49,16 @@ export default function Layout({ user, setUser }) {
       {/* Overlay for mobile */}
       {sidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-45 mt-16"
+          className="lg:hidden fixed inset-0 bg-black/50 z-40 mt-16"
           onClick={closeSidebar}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-45 w-64 bg-white border-r border-slate-200 flex flex-col transform transition-transform duration-300 ease-in-out overflow-y-auto ${
+        className={`fixed lg:static top-16 lg:top-0 bottom-0 left-0 z-40 w-64 bg-white border-r border-slate-200 flex flex-col transform transition-transform duration-300 ease-in-out overflow-y-auto ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        } mt-16 lg:mt-0`}
+        }`}
       >
         <div className="p-6 border-b border-slate-200 lg:block hidden">
           <h1 className="text-2xl font-bold text-[#109848] tracking-tight">Bogføring</h1>
