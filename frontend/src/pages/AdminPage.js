@@ -193,6 +193,7 @@ export default function AdminPage({ user }) {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <Card className="bg-white border border-slate-100 shadow-sm">
