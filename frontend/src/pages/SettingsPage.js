@@ -32,6 +32,7 @@ export default function SettingsPage({ user }) {
         startsaldo: res.data.startsaldo.toString(),
         periode_start: res.data.periode_start,
         periode_slut: res.data.periode_slut,
+        regnskabsaar: res.data.regnskabsaar || '2024-2025',
       });
     } catch (error) {
       toast.error('Kunne ikke hente indstillinger');
