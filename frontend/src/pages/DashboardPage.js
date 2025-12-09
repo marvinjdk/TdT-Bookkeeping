@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 export default function DashboardPage({ user }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchStats();
