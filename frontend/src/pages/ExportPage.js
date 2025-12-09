@@ -81,15 +81,40 @@ export default function ExportPage({ user }) {
         </CardHeader>
         <CardContent className="space-y-6">
           <p className="text-slate-600">
-            Download alle dine posteringer til en Excel-fil. Filen indeholder alle kolonner (Bilagnr., Bank dato, Tekst, Formål, Beløb, Type) og kan bruges til regnskab eller videre behandling.
+            Download posteringer til en Excel-fil. Filen indeholder alle kolonner (Hold, Bilagnr., Bank dato, Tekst, Formål, Beløb, Type) plus startsaldo og aktuel saldo.
           </p>
+
+          {user.role === 'admin' && (
+            <div className="space-y-2">
+              <Label htmlFor="afdeling-select" className="text-slate-700 font-medium">Vælg hold</Label>
+              <Select value={selectedAfdeling} onValueChange={setSelectedAfdeling}>
+                <SelectTrigger id="afdeling-select" data-testid="afdeling-select">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  <SelectItem value="all">Alle hold (separate ark)</SelectItem>
+                  {afdelinger.map((afd) => (
+                    <SelectItem key={afd.id} value={afd.id}>
+                      {afd.afdeling_navn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
             <h3 className="font-semibold text-slate-900 mb-2">Hvad inkluderes?</h3>
             <ul className="list-disc list-inside space-y-1 text-slate-700 text-sm">
-              <li>Alle posteringer for dit regnskab</li>
-              <li>Sorteret efter bank dato</li>
-              <li>Formateret til regnskabsbrug</li>
+              <li>Startsaldo i øverste række</li>
+              <li>Alle posteringer sorteret efter bank dato</li>
+              <li>Aktuel saldo beregnet (startsaldo + indtægter - udgifter)</li>
+              {user.role === 'admin' && selectedAfdeling === 'all' && (
+                <>
+                  <li>Separate faneblade per hold</li>
+                  <li>Samlet ark med alle posteringer</li>
+                </>
+              )}
             </ul>
           </div>
 
