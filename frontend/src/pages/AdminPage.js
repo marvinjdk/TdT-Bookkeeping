@@ -207,27 +207,27 @@ export default function AdminPage({ user }) {
           )}
           {currentUser.role === 'superbruger' && (
             <>
-            <Button
-              onClick={() => setShowManageAfdelingerDialog(true)}
-              variant="outline"
-              className="border-slate-300 hover:bg-slate-50 w-full sm:w-auto"
-              data-testid="manage-afdelinger-button"
-            >
-              <Edit2 size={18} className="mr-2" />
-              Administrer Afdelinger
-            </Button>
-            
-            <Dialog open={showDialog} onOpenChange={setShowDialog}>
-            <DialogTrigger asChild>
               <Button
-                data-testid="create-user-button"
-                className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95 w-full sm:w-auto"
+                onClick={() => setShowManageAfdelingerDialog(true)}
+                variant="outline"
+                className="border-slate-300 hover:bg-slate-50 w-full sm:w-auto"
+                data-testid="manage-afdelinger-button"
               >
-                <Plus size={18} className="mr-2" />
-                Opret bruger
+                <Edit2 size={18} className="mr-2" />
+                Administrer Afdelinger
               </Button>
-            </DialogTrigger>
-          <DialogContent className="bg-white">
+              
+              <Dialog open={showDialog} onOpenChange={setShowDialog}>
+                <DialogTrigger asChild>
+                  <Button
+                    data-testid="create-user-button"
+                    className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95 w-full sm:w-auto"
+                  >
+                    <Plus size={18} className="mr-2" />
+                    Opret bruger
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-white">
             <DialogHeader>
               <DialogTitle>Opret ny bruger</DialogTitle>
               <DialogDescription>Tilføj en ny afdeling eller admin bruger</DialogDescription>
