@@ -65,15 +65,22 @@ function App() {
           <Route path="/login" element={!user ? <LoginPage setUser={setUser} /> : <Navigate to="/" />} />
           <Route element={user ? <Layout user={user} setUser={setUser} /> : <Navigate to="/login" />}>
             <Route path="/" element={<DashboardPage user={user} />} />
-            <Route path="/transactions" element={<TransactionsPage user={user} />} />
-            <Route path="/transactions/new" element={<NewTransactionPage user={user} />} />
-            <Route path="/transactions/:id/edit" element={<EditTransactionPage user={user} />} />
-            <Route path="/export" element={<ExportPage user={user} />} />
-            <Route path="/settings" element={<SettingsPage user={user} />} />
+            
+            {/* Superbruger cannot access these routes */}
+            {user && user.role !== "superbruger" && (
+              <>
+                <Route path="/transactions" element={<TransactionsPage user={user} />} />
+                <Route path="/transactions/new" element={<NewTransactionPage user={user} />} />
+                <Route path="/transactions/:id/edit" element={<EditTransactionPage user={user} />} />
+                <Route path="/export" element={<ExportPage user={user} />} />
+                <Route path="/settings" element={<SettingsPage user={user} />} />
+              </>
+            )}
+            
             {user && (user.role === "admin" || user.role === "superbruger") && (
               <>
                 <Route path="/admin" element={<AdminPage user={user} />} />
-                <Route path="/admin/settings" element={<AdminSettingsPage />} />
+                {user.role === "admin" && <Route path="/admin/settings" element={<AdminSettingsPage />} />}
               </>
             )}
           </Route>
