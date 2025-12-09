@@ -392,6 +392,94 @@ export default function AdminPage({ user }) {
         </CardContent>
       </Card>
 
+      {/* Manage Afdelinger Dialog */}
+      <Dialog open={showManageAfdelingerDialog} onOpenChange={setShowManageAfdelingerDialog}>
+        <DialogContent className="bg-white max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Administrer Afdelinger</DialogTitle>
+            <DialogDescription>
+              Opret nye afdelinger eller slet eksisterende
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Button
+              onClick={() => setShowNewAfdelingDialog(true)}
+              className="w-full bg-[#109848] hover:bg-[#0d7a3a] text-white"
+            >
+              <Plus size={18} className="mr-2" />
+              Opret Ny Afdeling
+            </Button>
+            
+            <div className="border rounded-lg max-h-[400px] overflow-y-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50">
+                    <TableHead className="font-semibold">Afdelingsnavn</TableHead>
+                    <TableHead className="font-semibold text-right">Handling</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {afdelinger.map((afd) => (
+                    <TableRow key={afd.id}>
+                      <TableCell>{afd.navn}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteAfdeling(afd.id)}
+                          className="hover:bg-red-50 hover:text-red-600"
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create New Afdeling Dialog */}
+      <Dialog open={showNewAfdelingDialog} onOpenChange={setShowNewAfdelingDialog}>
+        <DialogContent className="bg-white">
+          <DialogHeader>
+            <DialogTitle>Opret Ny Afdeling</DialogTitle>
+            <DialogDescription>
+              Tilføj en ny afdeling til systemet
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="new-afdeling-name">Afdelingsnavn *</Label>
+              <Input
+                id="new-afdeling-name"
+                value={newAfdelingCreate}
+                onChange={(e) => setNewAfdelingCreate(e.target.value)}
+                className="bg-white border-slate-200 focus:border-[#109848]"
+                placeholder="F.eks. København Nord"
+              />
+            </div>
+            <div className="flex gap-3">
+              <Button
+                onClick={handleCreateAfdeling}
+                className="flex-1 bg-[#109848] hover:bg-[#0d7a3a] text-white"
+              >
+                Opret Afdeling
+              </Button>
+              <Button
+                onClick={() => setShowNewAfdelingDialog(false)}
+                variant="outline"
+                className="flex-1"
+              >
+                Annuller
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Password Change Dialog */}
       <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
         <DialogContent className="bg-white">
