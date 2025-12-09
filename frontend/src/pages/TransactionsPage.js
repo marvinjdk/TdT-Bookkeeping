@@ -30,7 +30,9 @@ export default function TransactionsPage({ user }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [formalFilter, setFormalFilter] = useState('all');
+  const [viewingAfdelingName, setViewingAfdelingName] = useState('');
   const navigate = useNavigate();
+  const isAdmin = user.role === 'admin' || user.role === 'superbruger';
 
   useEffect(() => {
     fetchTransactions();
