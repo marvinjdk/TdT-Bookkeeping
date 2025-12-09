@@ -101,7 +101,17 @@ export default function AdminPage({ user }) {
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">Admin Panel</h1>
           <p className="text-base md:text-lg text-slate-600 mt-2">Administrer brugere og afdelinger</p>
         </div>
-        <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button
+            onClick={() => navigate('/admin/settings')}
+            variant="outline"
+            className="border-[#109848] text-[#109848] hover:bg-[#109848]/10 w-full sm:w-auto"
+            data-testid="admin-settings-button"
+          >
+            <Settings size={18} className="mr-2" />
+            Hold Indstillinger
+          </Button>
+          <Dialog open={showDialog} onOpenChange={setShowDialog}>
           <DialogTrigger asChild>
             <Button
               data-testid="create-user-button"
