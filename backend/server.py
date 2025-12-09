@@ -467,7 +467,10 @@ async def export_excel(
 
 async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn):
     """Create a sheet for a specific afdeling with startsaldo and aktuel saldo"""
-    ws = wb.create_sheet(afdeling_navn[:31])  # Excel sheet name limit is 31 chars
+    # Clean sheet name - remove invalid characters and limit to 31 chars
+    clean_name = afdeling_navn.replace("/", "-").replace("\\", "-").replace("[", "").replace("]", "")
+    clean_name = clean_name.replace("*", "").replace("?", "").replace(":", "")[:31]
+    ws = wb.create_sheet(clean_name)
     
     # Get settings for startsaldo
     settings = await db.settings.find_one({"afdeling_id": afdeling_id}, {"_id": 0})
