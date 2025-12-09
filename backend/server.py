@@ -176,7 +176,7 @@ async def create_user(user_data: UserCreate, current_user: User = Depends(get_cu
 
 @api_router.get("/admin/users", response_model=List[User])
 async def list_users(current_user: User = Depends(get_current_user)):
-    if current_user.role != "admin":
+    if current_user.role not in ["admin", "superbruger"]:
         raise HTTPException(status_code=403, detail="Kun admins kan se alle brugere")
     
     users = await db.users.find({}, {"_id": 0, "password": 0}).to_list(1000)
