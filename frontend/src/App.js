@@ -69,7 +69,7 @@ function App() {
             <Route path="/transactions/:id/edit" element={<EditTransactionPage user={user} />} />
             <Route path="/export" element={<ExportPage user={user} />} />
             <Route path="/settings" element={<SettingsPage user={user} />} />
-            {user && user.role === "admin" && <Route path="/admin" element={<AdminPage />} />}
+            {user && (user.role === "admin" || user.role === "superbruger") && <Route path="/admin" element={<AdminPage user={user} />} />}
           </Route>
         </Routes>
       </BrowserRouter>
