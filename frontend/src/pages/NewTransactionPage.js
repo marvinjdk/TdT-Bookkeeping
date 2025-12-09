@@ -28,7 +28,6 @@ export default function NewTransactionPage() {
   const [loading, setLoading] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [formData, setFormData] = useState({
-    bilagnr: '',
     bank_dato: '',
     tekst: '',
     formal: '',
