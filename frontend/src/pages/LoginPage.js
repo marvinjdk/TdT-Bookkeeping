@@ -42,8 +42,8 @@ export default function LoginPage({ setUser }) {
     >
       <Card className="w-full max-w-md backdrop-blur-xl bg-white/90 border border-white/20 shadow-xl" data-testid="login-card">
         <CardHeader className="space-y-2 text-center pb-8">
-          <CardTitle className="text-3xl font-bold tracking-tight text-[#109848]">Bogføringsapp</CardTitle>
-          <CardDescription className="text-slate-600">Log ind for at administrere dit regnskab</CardDescription>
+          <CardTitle className="text-3xl font-bold tracking-tight text-[#109848]">Tour de Taxa</CardTitle>
+          <CardDescription className="text-slate-600">Log ind for at administrere bogføring</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-6">
