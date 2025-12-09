@@ -10,6 +10,7 @@ import NewTransactionPage from "@/pages/NewTransactionPage";
 import EditTransactionPage from "@/pages/EditTransactionPage";
 import ExportPage from "@/pages/ExportPage";
 import AdminPage from "@/pages/AdminPage";
+import AdminSettingsPage from "@/pages/AdminSettingsPage";
 import SettingsPage from "@/pages/SettingsPage";
 import Layout from "@/components/Layout";
 
