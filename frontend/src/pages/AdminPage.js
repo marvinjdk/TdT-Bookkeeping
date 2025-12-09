@@ -224,7 +224,8 @@ export default function AdminPage({ user }) {
               </Button>
             </form>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+          )}
         </div>
       </div>
 
