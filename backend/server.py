@@ -178,13 +178,84 @@ async def list_users(current_user: User = Depends(get_current_user)):
 
 @api_router.delete("/admin/users/{user_id}")
 async def delete_user(user_id: str, current_user: User = Depends(get_current_user)):
-    if current_user.role != "admin":
+    if current_user.role not in ["admin", "superbruger"]:
         raise HTTPException(status_code=403, detail="Kun admins kan slette brugere")
     
     result = await db.users.delete_one({"id": user_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Bruger ikke fundet")
     return {"success": True}
+
+@api_router.put("/admin/users/{user_id}/password")
+async def update_user_password(
+    user_id: str, 
+    password_update: UserPasswordUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != "superbruger":
+        raise HTTPException(status_code=403, detail="Kun superbruger kan ændre passwords")
+    
+    hashed_password = hash_password(password_update.new_password)
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"password": hashed_password}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Bruger ikke fundet")
+    return {"success": True}
+
+@api_router.get("/admin/settings/all")
+async def get_all_settings(current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "superbruger"]:
+        raise HTTPException(status_code=403, detail="Kun admins kan se alle indstillinger")
+    
+    # Get all afdelinger
+    afdelinger = await db.users.find({"role": "afdeling"}, {"_id": 0}).to_list(100)
+    
+    result = []
+    for afdeling in afdelinger:
+        settings = await db.settings.find_one({"afdeling_id": afdeling["id"]}, {"_id": 0})
+        if not settings:
+            settings_obj = SettingsModel(afdeling_id=afdeling["id"])
+            await db.settings.insert_one(settings_obj.model_dump())
+            settings = settings_obj.model_dump()
+        
+        result.append({
+            "afdeling_id": afdeling["id"],
+            "afdeling_navn": afdeling["afdeling_navn"],
+            "settings": SettingsModel(**settings)
+        })
+    
+    return result
+
+@api_router.put("/admin/settings/{afdeling_id}")
+async def update_afdeling_settings(
+    afdeling_id: str,
+    settings_update: SettingsUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role not in ["admin", "superbruger"]:
+        raise HTTPException(status_code=403, detail="Kun admins kan opdatere indstillinger")
+    
+    # Get existing settings or create new
+    existing = await db.settings.find_one({"afdeling_id": afdeling_id}, {"_id": 0})
+    if existing:
+        settings_obj = SettingsModel(**existing)
+    else:
+        settings_obj = SettingsModel(afdeling_id=afdeling_id)
+    
+    # Update with new values
+    update_data = settings_update.model_dump()
+    for key, value in update_data.items():
+        setattr(settings_obj, key, value)
+    
+    await db.settings.update_one(
+        {"afdeling_id": afdeling_id},
+        {"$set": settings_obj.model_dump()},
+        upsert=True
+    )
+    return settings_obj
 
 # Settings routes
 @api_router.get("/settings", response_model=SettingsModel)
