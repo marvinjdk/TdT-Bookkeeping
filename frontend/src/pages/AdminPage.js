@@ -1,0 +1,263 @@
+import { useEffect, useState } from 'react';
+import { api } from '@/App';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Plus, Trash2, Eye } from 'lucide-react';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+
+const AFDELINGER = [
+  'Himmerland',
+  'Vest- & Sydsjælland',
+  'Syd/Sønderjylland & Fyn',
+  'Øst- & Midtjylland',
+  'Hovedstaden, Barcelona-Paris',
+  'Nordsjælland & Hovedstadsområdet',
+  'Explore',
+];
+
+export default function AdminPage() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showDialog, setShowDialog] = useState(false);
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    role: 'afdeling',
+    afdeling_navn: '',
+  });
+  const [stats, setStats] = useState({});
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await api.get('/admin/users');
+      setUsers(res.data);
+      
+      // Fetch stats for all afdelinger
+      const statsPromises = res.data
+        .filter(u => u.role === 'afdeling')
+        .map(u => api.get(`/dashboard/stats?afdeling_id=${u.id}`));
+      const statsResults = await Promise.all(statsPromises);
+      
+      const statsMap = {};
+      res.data.filter(u => u.role === 'afdeling').forEach((u, i) => {
+        statsMap[u.id] = statsResults[i].data;
+      });
+      setStats(statsMap);
+    } catch (error) {
+      toast.error('Kunne ikke hente brugere');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post('/admin/users', formData);
+      toast.success('Bruger oprettet!');
+      setShowDialog(false);
+      setFormData({ username: '', password: '', role: 'afdeling', afdeling_navn: '' });
+      fetchUsers();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Kunne ikke oprette bruger');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Er du sikker på, at du vil slette denne bruger?')) return;
+
+    try {
+      await api.delete(`/admin/users/${id}`);
+      toast.success('Bruger slettet');
+      fetchUsers();
+    } catch (error) {
+      toast.error('Kunne ikke slette bruger');
+    }
+  };
+
+  const viewAfdelingTransactions = (afdelingId) => {
+    navigate(`/transactions?afdeling_id=${afdelingId}`);
+  };
+
+  if (loading) {
+    return <div className="p-8">Indlæser...</div>;
+  }
+
+  return (
+    <div className="p-6 md:p-8 lg:p-12 space-y-8" data-testid="admin-page">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight">Admin Panel</h1>
+          <p className="text-lg text-slate-600 mt-2">Administrer brugere og afdelinger</p>
+        </div>
+        <Dialog open={showDialog} onOpenChange={setShowDialog}>
+          <DialogTrigger asChild>
+            <Button
+              data-testid="create-user-button"
+              className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95"
+            >
+              <Plus size={18} className="mr-2" />
+              Opret bruger
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="bg-white">
+            <DialogHeader>
+              <DialogTitle>Opret ny bruger</DialogTitle>
+              <DialogDescription>Tilføj en ny afdeling eller admin bruger</DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleCreateUser} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="username">Brugernavn *</Label>
+                <Input
+                  id="username"
+                  data-testid="username-input"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  className="bg-white border-slate-200 focus:border-[#109848] focus:ring-2 focus:ring-[#109848]/20"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Adgangskode *</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  data-testid="password-input"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="bg-white border-slate-200 focus:border-[#109848] focus:ring-2 focus:ring-[#109848]/20"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="role">Rolle *</Label>
+                <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
+                  <SelectTrigger id="role" data-testid="role-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="afdeling">Afdeling</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {formData.role === 'afdeling' && (
+                <div className="space-y-2">
+                  <Label htmlFor="afdeling_navn">Afdelingsnavn *</Label>
+                  <Select
+                    value={formData.afdeling_navn}
+                    onValueChange={(value) => setFormData({ ...formData, afdeling_navn: value })}
+                  >
+                    <SelectTrigger id="afdeling_navn" data-testid="afdeling-select">
+                      <SelectValue placeholder="Vælg afdeling" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {AFDELINGER.map((afdeling) => (
+                        <SelectItem key={afdeling} value={afdeling}>
+                          {afdeling}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              <Button
+                type="submit"
+                data-testid="submit-user-button"
+                className="w-full bg-[#109848] hover:bg-[#0d7a3a] text-white"
+              >
+                Opret bruger
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <Card className="bg-white border border-slate-100 shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold">Brugeroversigt</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-slate-50 border-b border-slate-200">
+                  <TableHead className="font-semibold text-slate-700">Brugernavn</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Rolle</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Afdeling</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Saldo</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Posteringer</TableHead>
+                  <TableHead className="font-semibold text-slate-700 text-right">Handlinger</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((user) => (
+                  <TableRow
+                    key={user.id}
+                    data-testid={`user-row-${user.id}`}
+                    className="hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-0"
+                  >
+                    <TableCell className="font-medium">{user.username}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-medium ${
+                          user.role === 'admin' ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'
+                        }`}
+                      >
+                        {user.role === 'admin' ? 'Admin' : 'Afdeling'}
+                      </span>
+                    </TableCell>
+                    <TableCell>{user.afdeling_navn || '-'}</TableCell>
+                    <TableCell className="font-data">
+                      {user.role === 'afdeling' && stats[user.id]
+                        ? `${stats[user.id].aktuelt_saldo.toFixed(2)} kr.`
+                        : '-'}
+                    </TableCell>
+                    <TableCell>
+                      {user.role === 'afdeling' && stats[user.id] ? stats[user.id].antal_posteringer : '-'}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {user.role === 'afdeling' && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => navigate(`/?afdeling_id=${user.id}`)}
+                            data-testid={`view-afdeling-${user.id}`}
+                            className="hover:bg-slate-100"
+                          >
+                            <Eye size={16} />
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDelete(user.id)}
+                          data-testid={`delete-user-${user.id}`}
+                          className="hover:bg-red-50 hover:text-red-600"
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
