@@ -146,7 +146,7 @@ export default function AdminPage() {
                   <SelectTrigger id="role" data-testid="role-select">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper">
                     <SelectItem value="admin">Admin</SelectItem>
                     <SelectItem value="afdeling">Afdeling</SelectItem>
                   </SelectContent>
@@ -162,7 +162,7 @@ export default function AdminPage() {
                     <SelectTrigger id="afdeling_navn" data-testid="afdeling-select">
                       <SelectValue placeholder="Vælg afdeling" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="popper" className="max-h-[300px] overflow-y-auto">
                       {AFDELINGER.map((afdeling) => (
                         <SelectItem key={afdeling} value={afdeling}>
                           {afdeling}
