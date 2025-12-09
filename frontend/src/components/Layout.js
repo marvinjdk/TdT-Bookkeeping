@@ -16,13 +16,23 @@ export default function Layout({ user, setUser }) {
 
   const navItems = [
     { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/transactions', label: 'Posteringer', icon: FileText },
-    { path: '/export', label: 'Eksporter', icon: Download },
-    { path: '/settings', label: 'Indstillinger', icon: Settings },
   ];
 
-  if (user.role === 'admin' || user.role === 'superbruger') {
+  // Superbruger only sees Dashboard and Admin
+  if (user.role === 'superbruger') {
     navItems.push({ path: '/admin', label: 'Admin', icon: Users });
+  } 
+  // Admin and Afdeling see full menu
+  else {
+    navItems.push(
+      { path: '/transactions', label: 'Posteringer', icon: FileText },
+      { path: '/export', label: 'Eksporter', icon: Download },
+      { path: '/settings', label: 'Indstillinger', icon: Settings }
+    );
+    
+    if (user.role === 'admin') {
+      navItems.push({ path: '/admin', label: 'Admin', icon: Users });
+    }
   }
 
   const closeSidebar = () => setSidebarOpen(false);
