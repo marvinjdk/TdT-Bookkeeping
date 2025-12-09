@@ -61,8 +61,9 @@ class Token(BaseModel):
 
 class SettingsUpdate(BaseModel):
     startsaldo: float = 0.0
-    periode_start: str = "01-10"
-    periode_slut: str = "30-09"
+    periode_start: str = "01-10-2024"
+    periode_slut: str = "30-09-2025"
+    regnskabsaar: str = "2024-2025"
 
 class SettingsModel(BaseModel):
     model_config = ConfigDict(extra="ignore")
