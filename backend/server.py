@@ -376,7 +376,9 @@ async def update_transaction(
     if current_user.role == "afdeling" and existing["afdeling_id"] != current_user.id:
         raise HTTPException(status_code=403, detail="Ingen adgang")
     
+    # Don't allow bilagnr to be updated - keep existing
     update_data = transaction.model_dump()
+    # Bilagnr is already set and should not change
     await db.transactions.update_one({"id": transaction_id}, {"$set": update_data})
     
     updated = await db.transactions.find_one({"id": transaction_id}, {"_id": 0})
