@@ -223,26 +223,30 @@ export default function TransactionsPage({ user }) {
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => navigate(`/transactions/${transaction.id}/edit`)}
-                            data-testid={`edit-transaction-${transaction.id}`}
-                            className="hover:bg-slate-100"
-                          >
-                            <Edit size={16} />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDelete(transaction.id)}
-                            data-testid={`delete-transaction-${transaction.id}`}
-                            className="hover:bg-red-50 hover:text-red-600"
-                          >
-                            <Trash2 size={16} />
-                          </Button>
-                        </div>
+                        {!isAdmin ? (
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => navigate(`/transactions/${transaction.id}/edit`)}
+                              data-testid={`edit-transaction-${transaction.id}`}
+                              className="hover:bg-slate-100"
+                            >
+                              <Edit size={16} />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleDelete(transaction.id)}
+                              data-testid={`delete-transaction-${transaction.id}`}
+                              className="hover:bg-red-50 hover:text-red-600"
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </div>
+                        ) : (
+                          <span className="text-sm text-slate-500">Kun læsning</span>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
