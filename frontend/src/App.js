@@ -66,8 +66,15 @@ function App() {
           <Route element={user ? <Layout user={user} setUser={setUser} /> : <Navigate to="/login" />}>
             <Route path="/" element={<DashboardPage user={user} />} />
             
-            {/* Superbruger cannot access these routes */}
-            {user && user.role !== "superbruger" && (
+            {/* Superbruger cannot access these routes - redirect to dashboard */}
+            {user && user.role === "superbruger" ? (
+              <>
+                <Route path="/transactions" element={<Navigate to="/" replace />} />
+                <Route path="/transactions/*" element={<Navigate to="/" replace />} />
+                <Route path="/export" element={<Navigate to="/" replace />} />
+                <Route path="/settings" element={<Navigate to="/" replace />} />
+              </>
+            ) : user ? (
               <>
                 <Route path="/transactions" element={<TransactionsPage user={user} />} />
                 <Route path="/transactions/new" element={<NewTransactionPage user={user} />} />
@@ -75,7 +82,7 @@ function App() {
                 <Route path="/export" element={<ExportPage user={user} />} />
                 <Route path="/settings" element={<SettingsPage user={user} />} />
               </>
-            )}
+            ) : null}
             
             {user && (user.role === "admin" || user.role === "superbruger") && (
               <>
