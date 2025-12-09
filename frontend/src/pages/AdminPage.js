@@ -299,6 +299,7 @@ export default function AdminPage({ user }) {
             </form>
           </DialogContent>
         </Dialog>
+            </>
           )}
         </div>
       </div>
