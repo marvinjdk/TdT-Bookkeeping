@@ -310,6 +310,47 @@ export default function AdminPage({ user }) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Password Change Dialog */}
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent className="bg-white">
+          <DialogHeader>
+            <DialogTitle>Skift Password</DialogTitle>
+            <DialogDescription>
+              Skift password for bruger: {selectedUser?.username}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="new-password">Nyt Password *</Label>
+              <Input
+                id="new-password"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="bg-white border-slate-200 focus:border-[#109848]"
+                placeholder="Mindst 6 tegn"
+              />
+            </div>
+            <div className="flex gap-3">
+              <Button
+                onClick={handleChangePassword}
+                className="flex-1 bg-[#109848] hover:bg-[#0d7a3a] text-white"
+              >
+                <Key size={18} className="mr-2" />
+                Gem Password
+              </Button>
+              <Button
+                onClick={() => setShowPasswordDialog(false)}
+                variant="outline"
+                className="flex-1"
+              >
+                Annuller
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
