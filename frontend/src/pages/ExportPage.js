@@ -70,7 +70,7 @@ export default function ExportPage({ user }) {
             onClick={handleExport}
             data-testid="export-button"
             disabled={loading}
-            className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95"
+            className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95 w-full sm:w-auto"
           >
             {loading ? 'Eksporterer...' : (
               <>
