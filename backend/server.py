@@ -395,7 +395,11 @@ async def export_excel(
     elif current_user.role == "admin" and afdeling_id:
         query["afdeling_id"] = afdeling_id
     
-    transactions = await db.transactions.find(query, {"_id": 0}).sort("bank_dato", 1).to_list(10000)
+    projection = {
+        "_id": 0, "bilagnr": 1, "bank_dato": 1, 
+        "tekst": 1, "formal": 1, "belob": 1, "type": 1
+    }
+    transactions = await db.transactions.find(query, projection).sort("bank_dato", 1).to_list(10000)
     
     # Create Excel workbook
     wb = Workbook()
