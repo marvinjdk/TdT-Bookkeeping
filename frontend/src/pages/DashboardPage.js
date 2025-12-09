@@ -8,11 +8,27 @@ import { toast } from 'sonner';
 export default function DashboardPage({ user }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState([]);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    role: 'afdeling',
+    afdeling_navn: '',
+  });
   const navigate = useNavigate();
+  const isSuperbruger = user.role === 'superbruger';
 
   useEffect(() => {
-    fetchStats();
-  }, []);
+    if (isSuperbruger) {
+      fetchUsers();
+    } else {
+      fetchStats();
+    }
+  }, [isSuperbruger]);
 
   const fetchStats = async () => {
     try {
@@ -22,6 +38,49 @@ export default function DashboardPage({ user }) {
       toast.error('Kunne ikke hente statistik');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const res = await api.get('/admin/users');
+      setUsers(res.data);
+    } catch (error) {
+      toast.error('Kunne ikke hente brugere');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post('/admin/users', formData);
+      toast.success('Bruger oprettet!');
+      setShowCreateDialog(false);
+      setFormData({ username: '', password: '', role: 'afdeling', afdeling_navn: '' });
+      fetchUsers();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Kunne ikke oprette bruger');
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!newPassword || newPassword.length < 6) {
+      toast.error('Password skal være mindst 6 tegn');
+      return;
+    }
+
+    try {
+      await api.put(`/admin/users/${selectedUser.id}/password`, {
+        new_password: newPassword,
+      });
+      toast.success('Password ændret!');
+      setShowPasswordDialog(false);
+      setSelectedUser(null);
+      setNewPassword('');
+    } catch (error) {
+      toast.error('Kunne ikke ændre password');
     }
   };
 
