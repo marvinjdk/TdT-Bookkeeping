@@ -280,9 +280,9 @@ export default function AdminPage({ user }) {
                       <SelectValue placeholder="Vælg afdeling" />
                     </SelectTrigger>
                     <SelectContent position="popper" className="max-h-[300px] overflow-y-auto">
-                      {AFDELINGER.map((afdeling) => (
-                        <SelectItem key={afdeling} value={afdeling}>
-                          {afdeling}
+                      {afdelinger.map((afdeling) => (
+                        <SelectItem key={afdeling.id} value={afdeling.navn}>
+                          {afdeling.navn}
                         </SelectItem>
                       ))}
                     </SelectContent>
