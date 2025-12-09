@@ -287,25 +287,27 @@ export default function AdminPage({ user }) {
                           </Button>
                         )}
                         {currentUser.role === 'superbruger' && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleOpenPasswordDialog(user)}
-                            data-testid={`change-password-${user.id}`}
-                            className="hover:bg-blue-50 hover:text-blue-600"
-                          >
-                            <Key size={16} />
-                          </Button>
+                          <>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleOpenPasswordDialog(user)}
+                              data-testid={`change-password-${user.id}`}
+                              className="hover:bg-blue-50 hover:text-blue-600"
+                            >
+                              <Key size={16} />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleDelete(user.id)}
+                              data-testid={`delete-user-${user.id}`}
+                              className="hover:bg-red-50 hover:text-red-600"
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </>
                         )}
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleDelete(user.id)}
-                          data-testid={`delete-user-${user.id}`}
-                          className="hover:bg-red-50 hover:text-red-600"
-                        >
-                          <Trash2 size={16} />
-                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
