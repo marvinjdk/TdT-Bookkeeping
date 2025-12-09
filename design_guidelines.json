@@ -1,0 +1,137 @@
+{
+  "identity": {
+    "persona": "E1: The Anti-AI Designer",
+    "philosophy": "Fusion over Imitation. Emotion First. Content is King.",
+    "archetype": "Organic & Swiss (Trust, Growth, Clarity)",
+    "anti_patterns": [
+      "Inter everywhere",
+      "The Center-Everything Disease",
+      "The Gradient Overload",
+      "Generic SaaS Blue"
+    ]
+  },
+  "typography": {
+    "headings": {
+      "family": "Manrope",
+      "weights": ["600", "800"],
+      "usage": "Page titles, Section headers, Modal titles",
+      "letter_spacing": "tracking-tight"
+    },
+    "body": {
+      "family": "Public Sans",
+      "weights": ["400", "500"],
+      "usage": "General text, Labels, Form inputs",
+      "letter_spacing": "tracking-normal"
+    },
+    "data": {
+      "family": "JetBrains Mono",
+      "weights": ["400", "500"],
+      "usage": "Financial figures, Dates, IDs, Table data",
+      "letter_spacing": "tracking-tight"
+    }
+  },
+  "colors": {
+    "primary": {
+      "base": "#109848",
+      "hover": "#0d7a3a",
+      "active": "#0a602d",
+      "foreground": "#ffffff"
+    },
+    "secondary": {
+      "base": "#f1f5f9",
+      "foreground": "#0f172a"
+    },
+    "background": {
+      "page": "#f8fafc",
+      "card": "#ffffff",
+      "sidebar": "#ffffff"
+    },
+    "text": {
+      "primary": "#0f172a",
+      "secondary": "#64748b",
+      "muted": "#94a3b8"
+    },
+    "status": {
+      "success": "#109848",
+      "warning": "#f59e0b",
+      "error": "#ef4444",
+      "info": "#3b82f6"
+    },
+    "border": {
+      "default": "#e2e8f0",
+      "active": "#109848"
+    }
+  },
+  "layout": {
+    "spacing_scale": [
+      "p-1", "p-2", "p-4", "p-6", "p-8", "p-12", "p-16", "p-24", "p-32"
+    ],
+    "container_padding": "p-6 md:p-8 lg:p-12",
+    "grid_system": {
+      "dashboard": "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6",
+      "form": "grid grid-cols-1 md:grid-cols-2 gap-6"
+    },
+    "border_radius": {
+      "card": "rounded-xl",
+      "button": "rounded-lg",
+      "input": "rounded-md"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-[#109848] hover:bg-[#0d7a3a] text-white font-medium shadow-sm transition-all active:scale-95",
+      "secondary": "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-sm transition-all active:scale-95",
+      "ghost": "hover:bg-slate-100 text-slate-600 hover:text-slate-900"
+    },
+    "cards": {
+      "style": "bg-white border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-shadow duration-300",
+      "padding": "p-6"
+    },
+    "inputs": {
+      "style": "bg-white border-slate-200 focus:border-[#109848] focus:ring-2 focus:ring-[#109848]/20 transition-all placeholder:text-slate-400"
+    },
+    "tables": {
+      "header": "bg-slate-50 text-slate-500 font-medium text-xs uppercase tracking-wider border-b border-slate-200",
+      "row": "hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-0",
+      "cell": "py-4 px-4 text-sm text-slate-700"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": "backdrop-blur-xl bg-white/80 border border-white/20 shadow-sm",
+    "gradients": "None. Use solid colors or subtle noise textures.",
+    "shadows": "Soft, diffuse ambient shadows. No harsh drop shadows.",
+    "motion": {
+      "hover": "transition-all duration-200 ease-out",
+      "enter": "animate-in fade-in zoom-in-95 duration-300"
+    }
+  },
+  "images": {
+    "login_background": {
+      "url": "https://images.unsplash.com/photo-1621398945308-8bbe2fe60eb4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzF8MHwxfHNlYXJjaHwyfHxkYW5pc2glMjBuYXR1cmUlMjBsYW5kc2NhcGUlMjBtaW5pbWFsaXN0fGVufDB8fHx8MTc2NTI3MDkxMnww&ixlib=rb-4.1.0&q=85",
+      "description": "Green tree on green grass field - Use with a heavy glass overlay for the login card.",
+      "category": "background"
+    },
+    "empty_state_dashboard": {
+      "url": "https://images.unsplash.com/photo-1662994113650-2cc6cf17572f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxob3JzZSUyMHJpZGluZyUyMGVxdWVzdHJpYW4lMjBhYnN0cmFjdCUyMG1pbmltYWxpc3R8ZW58MHx8fHwxNzY1MjcwOTE2fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Horse standing in a field - Use for 'All caught up' or empty dashboard states.",
+      "category": "illustration"
+    },
+    "empty_state_receipts": {
+      "url": "https://images.unsplash.com/photo-1741665986410-514066d3eb9b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxob3JzZSUyMHJpZGluZyUyMGVxdWVzdHJpYW4lMjBhYnN0cmFjdCUyMG1pbmltYWxpc3R8ZW58MHx8fHwxNzY1MjcwOTE2fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Lone horse on hillside - Use for 'No receipts found' state.",
+      "category": "illustration"
+    }
+  },
+  "universal_guidelines": [
+    "DO NOT use Inter font for headings.",
+    "DO NOT use generic centered layouts.",
+    "DO NOT use gradients for the primary green.",
+    "ALWAYS use 'Manrope' for headings and 'JetBrains Mono' for financial data.",
+    "ALWAYS add 'data-testid' to interactive elements.",
+    "Use 2-3x more spacing than typical designs.",
+    "Ensure high contrast for text (WCAG AA).",
+    "Use 'sonner' for toast notifications.",
+    "Use 'lucide-react' for icons."
+  ],
+  "instructions_to_main_agent": "You are building a Danish accounting app. Follow the 'Organic & Swiss' archetype. The primary color is #109848. Use the provided image URLs for the login page and empty states. Ensure the dashboard is dense but readable ('Control Room' grid). Use Shadcn components but customize them to match the 'Organic' style (softer radii, specific focus states). STRICTLY follow the typography rules."
+}
