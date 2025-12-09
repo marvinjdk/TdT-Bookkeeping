@@ -27,7 +27,26 @@ export default function DashboardPage({ user }) {
     return <div className="p-8">Indlæser...</div>;
   }
 
-  const statCards = [
+  const isAdmin = user.role === 'admin' || user.role === 'superbruger';
+  
+  const statCards = isAdmin ? [
+    {
+      title: 'Total Indtægter (Alle hold)',
+      value: `${stats.total_indtaegter.toFixed(2)} kr.`,
+      icon: TrendingUp,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
+      testId: 'stat-indtaegter'
+    },
+    {
+      title: 'Total Udgifter (Alle hold)',
+      value: `${stats.total_udgifter.toFixed(2)} kr.`,
+      icon: TrendingDown,
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-50',
+      testId: 'stat-udgifter'
+    },
+  ] : [
     {
       title: 'Aktuel Saldo',
       value: `${stats.aktuelt_saldo.toFixed(2)} kr.`,
