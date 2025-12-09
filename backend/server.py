@@ -98,12 +98,18 @@ class Transaction(BaseModel):
     kvittering_url: Optional[str] = None
     oprettet: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+class AfdelingSaldo(BaseModel):
+    afdeling_id: str
+    afdeling_navn: str
+    aktuelt_saldo: float
+
 class DashboardStats(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    aktuelt_saldo: float
+    aktuelt_saldo: Optional[float] = None
     total_indtaegter: float
     total_udgifter: float
-    antal_posteringer: int
+    antal_posteringer: Optional[int] = None
+    afdelinger_saldi: Optional[List[AfdelingSaldo]] = None
 
 # Helper functions
 def hash_password(password: str) -> str:
