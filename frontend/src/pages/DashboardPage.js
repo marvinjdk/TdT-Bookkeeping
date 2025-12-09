@@ -88,7 +88,7 @@ export default function DashboardPage({ user }) {
         <p className="text-base md:text-lg text-slate-600 mt-2">Velkommen til {user.afdeling_navn || 'Tour de Taxa'}</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {statCards.map((stat) => {
           const Icon = stat.icon;
           return (
@@ -110,6 +110,29 @@ export default function DashboardPage({ user }) {
           );
         })}
       </div>
+
+      {isAdmin && stats.afdelinger_saldi && stats.afdelinger_saldi.length > 0 && (
+        <Card className="bg-white border border-slate-100 shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">Hold Oversigt</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {stats.afdelinger_saldi.map((afd) => (
+                <div 
+                  key={afd.afdeling_id}
+                  className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                >
+                  <span className="font-medium text-slate-700">{afd.afdeling_navn}</span>
+                  <span className={`font-bold font-data text-lg ${afd.aktuelt_saldo >= 0 ? 'text-[#109848]' : 'text-red-600'}`}>
+                    {afd.aktuelt_saldo.toFixed(2)} kr.
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="bg-white border border-slate-100 shadow-sm">
         <CardHeader>
