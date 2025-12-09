@@ -231,7 +231,27 @@ async def create_transaction(transaction: TransactionCreate, current_user: User 
     if current_user.role != "afdeling":
         raise HTTPException(status_code=403, detail="Kun afdelinger kan oprette posteringer")
     
+    # Get or create settings to get next bilagnr
+    settings = await db.settings.find_one({"afdeling_id": current_user.id}, {"_id": 0})
+    if not settings:
+        settings_obj = SettingsModel(afdeling_id=current_user.id)
+        await db.settings.insert_one(settings_obj.model_dump())
+        naeste_bilagnr = 1
+    else:
+        naeste_bilagnr = settings.get("naeste_bilagnr", 1)
+    
+    # Generate bilagnr
+    bilagnr = f"B{str(naeste_bilagnr).zfill(3)}"
+    
+    # Update next bilagnr in settings
+    await db.settings.update_one(
+        {"afdeling_id": current_user.id},
+        {"$set": {"naeste_bilagnr": naeste_bilagnr + 1}},
+        upsert=True
+    )
+    
     trans_dict = transaction.model_dump()
+    trans_dict["bilagnr"] = bilagnr
     trans_obj = Transaction(afdeling_id=current_user.id, **trans_dict)
     await db.transactions.insert_one(trans_obj.model_dump())
     return trans_obj
