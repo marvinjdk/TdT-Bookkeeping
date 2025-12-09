@@ -29,13 +29,13 @@ export default function EditTransactionPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    bilagnr: '',
     bank_dato: '',
     tekst: '',
     formal: '',
     belob: '',
     type: 'udgift',
   });
+  const [bilagnr, setBilagnr] = useState('');
   const [file, setFile] = useState(null);
 
   useEffect(() => {
