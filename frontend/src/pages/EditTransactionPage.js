@@ -122,18 +122,12 @@ export default function EditTransactionPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+            <div className="bg-slate-100 border border-slate-300 rounded-lg p-3 mb-4">
+              <p className="text-sm text-slate-700">
+                <strong>Bilagnummer:</strong> {bilagnr} (kan ikke ændres)
+              </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="bilagnr" className="text-slate-700 font-medium">Bilagnr. *</Label>
-                <Input
-                  id="bilagnr"
-                  data-testid="bilagnr-input"
-                  value={formData.bilagnr}
-                  onChange={(e) => handleChange('bilagnr', e.target.value)}
-                  className="bg-white border-slate-200 focus:border-[#109848] focus:ring-2 focus:ring-[#109848]/20"
-                  required
-                />
-              </div>
               <div className="space-y-2">
                 <Label htmlFor="bank_dato" className="text-slate-700 font-medium">Bank dato *</Label>
                 <Input
