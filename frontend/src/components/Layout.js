@@ -21,7 +21,7 @@ export default function Layout({ user, setUser }) {
     { path: '/settings', label: 'Indstillinger', icon: Settings },
   ];
 
-  if (user.role === 'admin') {
+  if (user.role === 'admin' || user.role === 'superbruger') {
     navItems.push({ path: '/admin', label: 'Admin', icon: Users });
   }
 
