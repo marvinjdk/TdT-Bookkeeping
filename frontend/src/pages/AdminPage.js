@@ -26,8 +26,10 @@ export default function AdminPage({ user }) {
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [showAfdelingDialog, setShowAfdelingDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newPassword, setNewPassword] = useState('');
+  const [newAfdelingNavn, setNewAfdelingNavn] = useState('');
   const [formData, setFormData] = useState({
     username: '',
     password: '',
