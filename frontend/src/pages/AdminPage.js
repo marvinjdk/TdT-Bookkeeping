@@ -147,6 +147,7 @@ export default function AdminPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent position="popper">
+                    {user.role === 'superbruger' && <SelectItem value="superbruger">Superbruger</SelectItem>}
                     <SelectItem value="admin">Admin</SelectItem>
                     <SelectItem value="afdeling">Afdeling</SelectItem>
                   </SelectContent>
