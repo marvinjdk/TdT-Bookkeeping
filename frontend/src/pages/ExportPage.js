@@ -42,13 +42,13 @@ export default function ExportPage({ user }) {
   };
 
   return (
-    <div className="p-6 md:p-8 lg:p-12 space-y-8" data-testid="export-page">
+    <div className="p-4 md:p-6 lg:p-12 space-y-6" data-testid="export-page">
       <div>
-        <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight">Eksporter</h1>
-        <p className="text-lg text-slate-600 mt-2">Download bogføringsdata til Excel</p>
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">Eksporter</h1>
+        <p className="text-base md:text-lg text-slate-600 mt-2">Download bogføringsdata til Excel</p>
       </div>
 
-      <Card className="bg-white border border-slate-100 shadow-sm max-w-2xl">
+      <Card className="bg-white border border-slate-100 shadow-sm w-full">
         <CardHeader>
           <CardTitle className="text-xl font-semibold">Excel eksport</CardTitle>
         </CardHeader>
