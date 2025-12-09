@@ -42,6 +42,14 @@ export default function LoginPage({ setUser }) {
     >
       <Card className="w-full max-w-md backdrop-blur-xl bg-white/90 border border-white/20 shadow-xl" data-testid="login-card">
         <CardHeader className="space-y-2 text-center pb-8">
+          <div className="flex justify-center mb-4">
+            <img 
+              src="/logo.png" 
+              alt="Tour de Taxa Logo" 
+              className="h-20 w-auto"
+              onError={(e) => e.target.style.display = 'none'}
+            />
+          </div>
           <CardTitle className="text-3xl font-bold tracking-tight text-[#109848]">Tour de Taxa</CardTitle>
           <CardDescription className="text-slate-600">Log ind for at administrere bogføring</CardDescription>
         </CardHeader>
