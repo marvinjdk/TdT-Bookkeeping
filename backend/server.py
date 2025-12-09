@@ -435,57 +435,111 @@ async def get_dashboard_stats(
     afdeling_id: Optional[str] = None,
     current_user: User = Depends(get_current_user)
 ):
-    query = {}
-    target_afdeling_id = None
-    
-    if current_user.role == "afdeling":
-        target_afdeling_id = current_user.id
-        query["afdeling_id"] = current_user.id
-    elif current_user.role == "admin" and afdeling_id:
-        target_afdeling_id = afdeling_id
-        query["afdeling_id"] = afdeling_id
-    
-    # Use aggregation pipeline for efficient calculation
-    pipeline = [
-        {"$match": query},
-        {
-            "$group": {
-                "_id": "$type",
-                "total": {"$sum": "$belob"},
-                "count": {"$sum": 1}
+    # Admin sees all afdelinger with their saldi
+    if current_user.role in ["admin", "superbruger"] and not afdeling_id:
+        # Get all afdelinger
+        afdelinger = await db.users.find({"role": "afdeling"}, {"_id": 0}).to_list(100)
+        
+        afdelinger_saldi = []
+        total_indtaegter_all = 0.0
+        total_udgifter_all = 0.0
+        
+        for afdeling in afdelinger:
+            # Get transactions for this afdeling
+            pipeline = [
+                {"$match": {"afdeling_id": afdeling["id"]}},
+                {
+                    "$group": {
+                        "_id": "$type",
+                        "total": {"$sum": "$belob"}
+                    }
+                }
+            ]
+            
+            results = await db.transactions.aggregate(pipeline).to_list(None)
+            
+            indtaegter = 0.0
+            udgifter = 0.0
+            
+            for result in results:
+                if result["_id"] == "indtaegt":
+                    indtaegter = result["total"]
+                elif result["_id"] == "udgift":
+                    udgifter = result["total"]
+            
+            # Get startsaldo
+            settings = await db.settings.find_one({"afdeling_id": afdeling["id"]}, {"_id": 0})
+            startsaldo = settings.get("startsaldo", 0.0) if settings else 0.0
+            
+            aktuelt_saldo = startsaldo + indtaegter - udgifter
+            
+            afdelinger_saldi.append(AfdelingSaldo(
+                afdeling_id=afdeling["id"],
+                afdeling_navn=afdeling["afdeling_navn"],
+                aktuelt_saldo=aktuelt_saldo
+            ))
+            
+            total_indtaegter_all += indtaegter
+            total_udgifter_all += udgifter
+        
+        return DashboardStats(
+            total_indtaegter=total_indtaegter_all,
+            total_udgifter=total_udgifter_all,
+            afdelinger_saldi=afdelinger_saldi
+        )
+    else:
+        # Single afdeling view
+        query = {}
+        target_afdeling_id = None
+        
+        if current_user.role == "afdeling":
+            target_afdeling_id = current_user.id
+            query["afdeling_id"] = current_user.id
+        elif current_user.role in ["admin", "superbruger"] and afdeling_id:
+            target_afdeling_id = afdeling_id
+            query["afdeling_id"] = afdeling_id
+        
+        # Use aggregation pipeline for efficient calculation
+        pipeline = [
+            {"$match": query},
+            {
+                "$group": {
+                    "_id": "$type",
+                    "total": {"$sum": "$belob"},
+                    "count": {"$sum": 1}
+                }
             }
-        }
-    ]
-    
-    results = await db.transactions.aggregate(pipeline).to_list(None)
-    
-    total_indtaegter = 0.0
-    total_udgifter = 0.0
-    antal_posteringer = 0
-    
-    for result in results:
-        if result["_id"] == "indtaegt":
-            total_indtaegter = result["total"]
-            antal_posteringer += result["count"]
-        elif result["_id"] == "udgift":
-            total_udgifter = result["total"]
-            antal_posteringer += result["count"]
-    
-    # Get startsaldo
-    startsaldo = 0.0
-    if target_afdeling_id:
-        settings = await db.settings.find_one({"afdeling_id": target_afdeling_id}, {"_id": 0})
-        if settings:
-            startsaldo = settings.get("startsaldo", 0.0)
-    
-    aktuelt_saldo = startsaldo + total_indtaegter - total_udgifter
-    
-    return DashboardStats(
-        aktuelt_saldo=aktuelt_saldo,
-        total_indtaegter=total_indtaegter,
-        total_udgifter=total_udgifter,
-        antal_posteringer=antal_posteringer
-    )
+        ]
+        
+        results = await db.transactions.aggregate(pipeline).to_list(None)
+        
+        total_indtaegter = 0.0
+        total_udgifter = 0.0
+        antal_posteringer = 0
+        
+        for result in results:
+            if result["_id"] == "indtaegt":
+                total_indtaegter = result["total"]
+                antal_posteringer += result["count"]
+            elif result["_id"] == "udgift":
+                total_udgifter = result["total"]
+                antal_posteringer += result["count"]
+        
+        # Get startsaldo
+        startsaldo = 0.0
+        if target_afdeling_id:
+            settings = await db.settings.find_one({"afdeling_id": target_afdeling_id}, {"_id": 0})
+            if settings:
+                startsaldo = settings.get("startsaldo", 0.0)
+        
+        aktuelt_saldo = startsaldo + total_indtaegter - total_udgifter
+        
+        return DashboardStats(
+            aktuelt_saldo=aktuelt_saldo,
+            total_indtaegter=total_indtaegter,
+            total_udgifter=total_udgifter,
+            antal_posteringer=antal_posteringer
+        )
 
 # Excel export
 @api_router.get("/export/excel")
