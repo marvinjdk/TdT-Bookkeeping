@@ -33,10 +33,14 @@ export default function TransactionsPage({ user }) {
   const [viewingAfdelingName, setViewingAfdelingName] = useState('');
   const navigate = useNavigate();
   const isAdmin = user.role === 'admin' || user.role === 'superbruger';
+  
+  // Get afdeling_id from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const viewingAfdelingId = urlParams.get('afdeling_id');
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
+  }, [viewingAfdelingId]); // Re-fetch when afdeling_id changes
 
   useEffect(() => {
     applyFilters();
