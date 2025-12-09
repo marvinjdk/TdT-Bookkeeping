@@ -158,7 +158,7 @@ async def get_me(current_user: User = Depends(get_current_user)):
 # Admin routes
 @api_router.post("/admin/users", response_model=User)
 async def create_user(user_data: UserCreate, current_user: User = Depends(get_current_user)):
-    if current_user.role != "admin":
+    if current_user.role not in ["admin", "superbruger"]:
         raise HTTPException(status_code=403, detail="Kun admins kan oprette brugere")
     
     existing = await db.users.find_one({"username": user_data.username}, {"_id": 0})
