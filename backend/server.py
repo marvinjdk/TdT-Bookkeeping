@@ -184,8 +184,8 @@ async def list_users(current_user: User = Depends(get_current_user)):
 
 @api_router.delete("/admin/users/{user_id}")
 async def delete_user(user_id: str, current_user: User = Depends(get_current_user)):
-    if current_user.role not in ["admin", "superbruger"]:
-        raise HTTPException(status_code=403, detail="Kun admins kan slette brugere")
+    if current_user.role != "superbruger":
+        raise HTTPException(status_code=403, detail="Kun superbruger kan slette brugere")
     
     result = await db.users.delete_one({"id": user_id})
     if result.deleted_count == 0:
