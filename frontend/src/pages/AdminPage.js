@@ -62,6 +62,15 @@ export default function AdminPage({ user }) {
     }
   };
 
+  const fetchAfdelinger = async () => {
+    try {
+      const res = await api.get('/admin/afdelinger');
+      setAfdelinger(res.data);
+    } catch (error) {
+      console.error('Kunne ikke hente afdelinger');
+    }
+  };
+
   const handleCreateUser = async (e) => {
     e.preventDefault();
     try {
