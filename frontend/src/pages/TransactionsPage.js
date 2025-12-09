@@ -44,7 +44,23 @@ export default function TransactionsPage({ user }) {
 
   const fetchTransactions = async () => {
     try {
-      const res = await api.get('/transactions');
+      // Check if viewing specific afdeling from query params
+      const urlParams = new URLSearchParams(window.location.search);
+      const afdelingId = urlParams.get('afdeling_id');
+      
+      let url = '/transactions';
+      if (afdelingId && isAdmin) {
+        url += `?afdeling_id=${afdelingId}`;
+        
+        // Get afdeling name
+        const usersRes = await api.get('/admin/users');
+        const afdeling = usersRes.data.find(u => u.id === afdelingId);
+        if (afdeling) {
+          setViewingAfdelingName(afdeling.afdeling_navn);
+        }
+      }
+      
+      const res = await api.get(url);
       setTransactions(res.data);
     } catch (error) {
       toast.error('Kunne ikke hente posteringer');
