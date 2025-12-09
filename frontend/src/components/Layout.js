@@ -61,7 +61,8 @@ export default function Layout({ user, setUser }) {
         }`}
       >
         <div className="p-6 border-b border-slate-200 lg:block hidden">
-          <h1 className="text-2xl font-bold text-[#109848] tracking-tight">Bogføring</h1>
+          <h1 className="text-xl font-bold text-[#109848] tracking-tight">Tour de Taxa</h1>
+          <p className="text-xs text-slate-500 mt-1">Bogføring</p>
           <p className="text-sm text-slate-600 mt-1">{user.afdeling_navn || user.username}</p>
         </div>
         <nav className="flex-1 p-4 space-y-1">
