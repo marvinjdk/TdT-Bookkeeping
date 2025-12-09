@@ -117,6 +117,32 @@ export default function AdminPage({ user }) {
     }
   };
 
+  const handleOpenAfdelingDialog = (user) => {
+    setSelectedUser(user);
+    setNewAfdelingNavn(user.afdeling_navn || '');
+    setShowAfdelingDialog(true);
+  };
+
+  const handleChangeAfdelingNavn = async () => {
+    if (!newAfdelingNavn || newAfdelingNavn.trim().length === 0) {
+      toast.error('Afdelingsnavn skal udfyldes');
+      return;
+    }
+
+    try {
+      await api.put(`/admin/users/${selectedUser.id}/afdeling`, {
+        afdeling_navn: newAfdelingNavn,
+      });
+      toast.success('Afdelingsnavn ændret!');
+      setShowAfdelingDialog(false);
+      setSelectedUser(null);
+      setNewAfdelingNavn('');
+      fetchUsers();
+    } catch (error) {
+      toast.error('Kunne ikke ændre afdelingsnavn');
+    }
+  };
+
   const viewAfdelingTransactions = (afdelingId) => {
     navigate(`/transactions?afdeling_id=${afdelingId}`);
   };
