@@ -99,6 +99,19 @@ export default function SettingsPage({ user }) {
               <p className="text-sm text-slate-600">Startsaldo fra banken (1. oktober)</p>
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="regnskabsaar" className="text-slate-700 font-medium">Regnskabsår</Label>
+              <Input
+                id="regnskabsaar"
+                data-testid="regnskabsaar-input"
+                value={settings.regnskabsaar}
+                onChange={(e) => setSettings({ ...settings, regnskabsaar: e.target.value })}
+                className="bg-white border-slate-200 focus:border-[#109848] focus:ring-2 focus:ring-[#109848]/20"
+                placeholder="2024-2025"
+              />
+              <p className="text-sm text-slate-600">F.eks. 2024-2025</p>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="periode_start" className="text-slate-700 font-medium">Periode start</Label>
@@ -108,9 +121,9 @@ export default function SettingsPage({ user }) {
                   value={settings.periode_start}
                   onChange={(e) => setSettings({ ...settings, periode_start: e.target.value })}
                   className="bg-white border-slate-200 focus:border-[#109848] focus:ring-2 focus:ring-[#109848]/20"
-                  placeholder="DD-MM"
+                  placeholder="DD-MM-ÅÅÅÅ"
                 />
-                <p className="text-sm text-slate-600">Format: DD-MM</p>
+                <p className="text-sm text-slate-600">Format: DD-MM-ÅÅÅÅ</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="periode_slut" className="text-slate-700 font-medium">Periode slut</Label>
@@ -120,9 +133,9 @@ export default function SettingsPage({ user }) {
                   value={settings.periode_slut}
                   onChange={(e) => setSettings({ ...settings, periode_slut: e.target.value })}
                   className="bg-white border-slate-200 focus:border-[#109848] focus:ring-2 focus:ring-[#109848]/20"
-                  placeholder="DD-MM"
+                  placeholder="DD-MM-ÅÅÅÅ"
                 />
-                <p className="text-sm text-slate-600">Format: DD-MM</p>
+                <p className="text-sm text-slate-600">Format: DD-MM-ÅÅÅÅ</p>
               </div>
             </div>
 
