@@ -30,7 +30,7 @@ export default function Layout({ user, setUser }) {
   return (
     <div className="flex min-h-screen bg-[#f8fafc]">
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-40 flex items-center justify-between px-4">
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-50 flex items-center justify-between px-4">
         <div>
           <h1 className="text-xl font-bold text-[#109848] tracking-tight">Bogføring</h1>
           <p className="text-xs text-slate-600">{user.afdeling_navn || user.username}</p>
@@ -49,22 +49,22 @@ export default function Layout({ user, setUser }) {
       {/* Overlay for mobile */}
       {sidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          className="lg:hidden fixed inset-0 bg-black/50 z-45 mt-16"
           onClick={closeSidebar}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col transform transition-transform duration-300 ease-in-out ${
+        className={`fixed lg:static inset-y-0 left-0 z-45 w-64 bg-white border-r border-slate-200 flex flex-col transform transition-transform duration-300 ease-in-out overflow-y-auto ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
+        } mt-16 lg:mt-0`}
       >
         <div className="p-6 border-b border-slate-200 lg:block hidden">
           <h1 className="text-2xl font-bold text-[#109848] tracking-tight">Bogføring</h1>
           <p className="text-sm text-slate-600 mt-1">{user.afdeling_navn || user.username}</p>
         </div>
-        <nav className="flex-1 p-4 space-y-1 mt-16 lg:mt-0">
+        <nav className="flex-1 p-4 space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
