@@ -61,9 +61,17 @@ export default function Layout({ user, setUser }) {
         }`}
       >
         <div className="p-6 border-b border-slate-200 lg:block hidden">
-          <h1 className="text-xl font-bold text-[#109848] tracking-tight">Tour de Taxa</h1>
-          <p className="text-xs text-slate-500 mt-1">Bogføring</p>
-          <p className="text-sm text-slate-600 mt-1">{user.afdeling_navn || user.username}</p>
+          <div className="flex flex-col items-center mb-4">
+            <img 
+              src="/logo.png" 
+              alt="Tour de Taxa Logo" 
+              className="h-16 w-auto mb-3"
+              onError={(e) => e.target.style.display = 'none'}
+            />
+            <h1 className="text-xl font-bold text-[#109848] tracking-tight text-center">Tour de Taxa</h1>
+            <p className="text-xs text-slate-500 mt-1">Bogføring</p>
+          </div>
+          <p className="text-sm text-slate-600 text-center">{user.afdeling_navn || user.username}</p>
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {navItems.map((item) => {
