@@ -32,7 +32,7 @@ export default function Layout({ user, setUser }) {
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-50 flex items-center justify-between px-4">
         <div>
-          <h1 className="text-xl font-bold text-[#109848] tracking-tight">Bogføring</h1>
+          <h1 className="text-lg font-bold text-[#109848] tracking-tight">Tour de Taxa</h1>
           <p className="text-xs text-slate-600">{user.afdeling_navn || user.username}</p>
         </div>
         <Button
