@@ -197,17 +197,28 @@ async def get_settings(current_user: User = Depends(get_current_user)):
     return SettingsModel(**settings)
 
 @api_router.put("/settings", response_model=SettingsModel)
-async def update_settings(settings: SettingsModel, current_user: User = Depends(get_current_user)):
+async def update_settings(settings_update: SettingsUpdate, current_user: User = Depends(get_current_user)):
     if current_user.role != "afdeling":
         raise HTTPException(status_code=403, detail="Kun afdelinger kan opdatere indstillinger")
     
-    settings.afdeling_id = current_user.id
+    # Get existing settings or create new
+    existing = await db.settings.find_one({"afdeling_id": current_user.id}, {"_id": 0})
+    if existing:
+        settings_obj = SettingsModel(**existing)
+    else:
+        settings_obj = SettingsModel(afdeling_id=current_user.id)
+    
+    # Update with new values
+    update_data = settings_update.model_dump()
+    for key, value in update_data.items():
+        setattr(settings_obj, key, value)
+    
     await db.settings.update_one(
         {"afdeling_id": current_user.id},
-        {"$set": settings.model_dump()},
+        {"$set": settings_obj.model_dump()},
         upsert=True
     )
-    return settings
+    return settings_obj
 
 # Transaction routes
 @api_router.post("/transactions", response_model=Transaction)
