@@ -206,6 +206,17 @@ export default function AdminPage({ user }) {
             </Button>
           )}
           {currentUser.role === 'superbruger' && (
+            <>
+            <Button
+              onClick={() => setShowManageAfdelingerDialog(true)}
+              variant="outline"
+              className="border-slate-300 hover:bg-slate-50 w-full sm:w-auto"
+              data-testid="manage-afdelinger-button"
+            >
+              <Edit2 size={18} className="mr-2" />
+              Administrer Afdelinger
+            </Button>
+            
             <Dialog open={showDialog} onOpenChange={setShowDialog}>
             <DialogTrigger asChild>
               <Button
