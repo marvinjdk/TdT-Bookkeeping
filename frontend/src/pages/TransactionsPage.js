@@ -112,16 +112,20 @@ export default function TransactionsPage({ user }) {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">Posteringer</h1>
-          <p className="text-base md:text-lg text-slate-600 mt-2">Administrer dine bogføringsposteringer</p>
+          <p className="text-base md:text-lg text-slate-600 mt-2">
+            {viewingAfdelingName ? `Posteringer for ${viewingAfdelingName}` : 'Administrer dine bogføringsposteringer'}
+          </p>
         </div>
-        <Button
-          onClick={() => navigate('/transactions/new')}
-          data-testid="new-transaction-button"
-          className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95 w-full sm:w-auto"
-        >
-          <Plus size={18} className="mr-2" />
-          Ny postering
-        </Button>
+        {!isAdmin && (
+          <Button
+            onClick={() => navigate('/transactions/new')}
+            data-testid="new-transaction-button"
+            className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95 w-full sm:w-auto"
+          >
+            <Plus size={18} className="mr-2" />
+            Ny postering
+          </Button>
+        )}
       </div>
 
       <Card className="bg-white border border-slate-100 shadow-sm">
