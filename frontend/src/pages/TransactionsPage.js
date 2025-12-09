@@ -126,7 +126,7 @@ export default function TransactionsPage({ user }) {
               <SelectTrigger data-testid="type-filter">
                 <SelectValue placeholder="Type" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent position="popper">
                 <SelectItem value="all">Alle typer</SelectItem>
                 <SelectItem value="indtaegt">Indtægt</SelectItem>
                 <SelectItem value="udgift">Udgift</SelectItem>
@@ -136,7 +136,7 @@ export default function TransactionsPage({ user }) {
               <SelectTrigger data-testid="formal-filter">
                 <SelectValue placeholder="Formål" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent position="popper" className="max-h-[300px] overflow-y-auto">
                 <SelectItem value="all">Alle formål</SelectItem>
                 {FORMAL_OPTIONS.map((option) => (
                   <SelectItem key={option} value={option}>
