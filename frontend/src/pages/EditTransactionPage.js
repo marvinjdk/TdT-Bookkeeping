@@ -45,8 +45,8 @@ export default function EditTransactionPage() {
   const fetchTransaction = async () => {
     try {
       const res = await api.get(`/transactions/${id}`);
+      setBilagnr(res.data.bilagnr);
       setFormData({
-        bilagnr: res.data.bilagnr,
         bank_dato: res.data.bank_dato,
         tekst: res.data.tekst,
         formal: res.data.formal,
