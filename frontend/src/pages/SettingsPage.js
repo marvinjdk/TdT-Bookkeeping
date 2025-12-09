@@ -128,7 +128,7 @@ export default function SettingsPage({ user }) {
               type="submit"
               data-testid="save-settings-button"
               disabled={saving}
-              className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95"
+              className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95 w-full sm:w-auto"
             >
               {saving ? 'Gemmer...' : (
                 <>
