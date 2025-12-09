@@ -11,25 +11,19 @@ import { Plus, Trash2, Eye, Settings, Key, Edit2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
-const AFDELINGER = [
-  'Himmerland',
-  'Vest- & Sydsjælland',
-  'Syd/Sønderjylland & Fyn',
-  'Øst- & Midtjylland',
-  'Hovedstaden, Barcelona-Paris',
-  'Nordsjælland & Hovedstadsområdet',
-  'Explore',
-];
-
 export default function AdminPage({ user }) {
   const [users, setUsers] = useState([]);
+  const [afdelinger, setAfdelinger] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [showAfdelingDialog, setShowAfdelingDialog] = useState(false);
+  const [showNewAfdelingDialog, setShowNewAfdelingDialog] = useState(false);
+  const [showManageAfdelingerDialog, setShowManageAfdelingerDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newPassword, setNewPassword] = useState('');
   const [newAfdelingNavn, setNewAfdelingNavn] = useState('');
+  const [newAfdelingCreate, setNewAfdelingCreate] = useState('');
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -42,6 +36,7 @@ export default function AdminPage({ user }) {
 
   useEffect(() => {
     fetchUsers();
+    fetchAfdelinger();
   }, []);
 
   const fetchUsers = async () => {
