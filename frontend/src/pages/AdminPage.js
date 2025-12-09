@@ -95,11 +95,11 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="p-6 md:p-8 lg:p-12 space-y-8" data-testid="admin-page">
-      <div className="flex items-center justify-between">
+    <div className="p-4 md:p-6 lg:p-12 space-y-6" data-testid="admin-page">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight">Admin Panel</h1>
-          <p className="text-lg text-slate-600 mt-2">Administrer brugere og afdelinger</p>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">Admin Panel</h1>
+          <p className="text-base md:text-lg text-slate-600 mt-2">Administrer brugere og afdelinger</p>
         </div>
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
           <DialogTrigger asChild>
