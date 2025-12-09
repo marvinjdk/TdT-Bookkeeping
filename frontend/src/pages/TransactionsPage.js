@@ -47,21 +47,21 @@ export default function TransactionsPage({ user }) {
   }, [transactions, searchTerm, typeFilter, formalFilter]);
 
   const fetchTransactions = async () => {
+    setLoading(true);
     try {
-      // Check if viewing specific afdeling from query params
-      const urlParams = new URLSearchParams(window.location.search);
-      const afdelingId = urlParams.get('afdeling_id');
-      
       let url = '/transactions';
-      if (afdelingId && isAdmin) {
-        url += `?afdeling_id=${afdelingId}`;
+      
+      if (viewingAfdelingId && isAdmin) {
+        url += `?afdeling_id=${viewingAfdelingId}`;
         
         // Get afdeling name
         const usersRes = await api.get('/admin/users');
-        const afdeling = usersRes.data.find(u => u.id === afdelingId);
+        const afdeling = usersRes.data.find(u => u.id === viewingAfdelingId);
         if (afdeling) {
           setViewingAfdelingName(afdeling.afdeling_navn);
         }
+      } else {
+        setViewingAfdelingName('');
       }
       
       const res = await api.get(url);
