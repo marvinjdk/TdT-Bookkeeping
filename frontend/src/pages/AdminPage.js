@@ -142,16 +142,17 @@ export default function AdminPage({ user }) {
               Hold Indstillinger
             </Button>
           )}
-          <Dialog open={showDialog} onOpenChange={setShowDialog}>
-          <DialogTrigger asChild>
-            <Button
-              data-testid="create-user-button"
-              className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95 w-full sm:w-auto"
-            >
-              <Plus size={18} className="mr-2" />
-              Opret bruger
-            </Button>
-          </DialogTrigger>
+          {currentUser.role === 'superbruger' && (
+            <Dialog open={showDialog} onOpenChange={setShowDialog}>
+            <DialogTrigger asChild>
+              <Button
+                data-testid="create-user-button"
+                className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95 w-full sm:w-auto"
+              >
+                <Plus size={18} className="mr-2" />
+                Opret bruger
+              </Button>
+            </DialogTrigger>
           <DialogContent className="bg-white">
             <DialogHeader>
               <DialogTitle>Opret ny bruger</DialogTitle>
