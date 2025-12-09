@@ -141,7 +141,7 @@ export default function NewTransactionPage() {
                   <SelectTrigger id="formal" data-testid="formal-select">
                     <SelectValue placeholder="Vælg formål" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper" className="max-h-[300px] overflow-y-auto">
                     {FORMAL_OPTIONS.map((option) => (
                       <SelectItem key={option} value={option}>
                         {option}
@@ -156,7 +156,7 @@ export default function NewTransactionPage() {
                   <SelectTrigger id="type" data-testid="type-select">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper">
                     <SelectItem value="indtaegt">Indtægt</SelectItem>
                     <SelectItem value="udgift">Udgift</SelectItem>
                   </SelectContent>
