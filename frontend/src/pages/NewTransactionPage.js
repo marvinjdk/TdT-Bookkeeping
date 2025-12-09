@@ -74,19 +74,19 @@ export default function NewTransactionPage() {
   };
 
   return (
-    <div className="p-6 md:p-8 lg:p-12 space-y-8" data-testid="new-transaction-page">
-      <div className="flex items-center gap-4">
+    <div className="p-4 md:p-6 lg:p-12 space-y-6" data-testid="new-transaction-page">
+      <div className="flex items-center gap-3">
         <Button
           variant="ghost"
           onClick={() => navigate('/transactions')}
           data-testid="back-button"
-          className="hover:bg-slate-100"
+          className="hover:bg-slate-100 flex-shrink-0"
         >
           <ArrowLeft size={20} />
         </Button>
         <div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight">Ny postering</h1>
-          <p className="text-lg text-slate-600 mt-2">Opret en ny bogføringspostering</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight">Ny postering</h1>
+          <p className="text-sm md:text-base lg:text-lg text-slate-600 mt-1">Opret en ny bogføringspostering</p>
         </div>
       </div>
 
