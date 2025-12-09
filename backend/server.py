@@ -40,12 +40,15 @@ api_router = APIRouter(prefix="/api")
 class UserCreate(BaseModel):
     username: str
     password: str
-    role: Literal["admin", "afdeling"]
+    role: Literal["admin", "afdeling", "superbruger"]
     afdeling_navn: Optional[str] = None
 
 class UserLogin(BaseModel):
     username: str
     password: str
+
+class UserPasswordUpdate(BaseModel):
+    new_password: str
 
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
