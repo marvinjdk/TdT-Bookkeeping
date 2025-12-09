@@ -21,7 +21,7 @@ const AFDELINGER = [
   'Explore',
 ];
 
-export default function AdminPage() {
+export default function AdminPage({ user }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
