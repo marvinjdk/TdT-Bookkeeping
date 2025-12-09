@@ -105,7 +105,7 @@ export default function AdminPage() {
           <DialogTrigger asChild>
             <Button
               data-testid="create-user-button"
-              className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95"
+              className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95 w-full sm:w-auto"
             >
               <Plus size={18} className="mr-2" />
               Opret bruger
