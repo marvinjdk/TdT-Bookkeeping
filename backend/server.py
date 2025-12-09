@@ -341,10 +341,31 @@ async def get_dashboard_stats(
         target_afdeling_id = afdeling_id
         query["afdeling_id"] = afdeling_id
     
-    transactions = await db.transactions.find(query, {"_id": 0}).to_list(10000)
+    # Use aggregation pipeline for efficient calculation
+    pipeline = [
+        {"$match": query},
+        {
+            "$group": {
+                "_id": "$type",
+                "total": {"$sum": "$belob"},
+                "count": {"$sum": 1}
+            }
+        }
+    ]
     
-    total_indtaegter = sum(t["belob"] for t in transactions if t["type"] == "indtaegt")
-    total_udgifter = sum(t["belob"] for t in transactions if t["type"] == "udgift")
+    results = await db.transactions.aggregate(pipeline).to_list(None)
+    
+    total_indtaegter = 0.0
+    total_udgifter = 0.0
+    antal_posteringer = 0
+    
+    for result in results:
+        if result["_id"] == "indtaegt":
+            total_indtaegter = result["total"]
+            antal_posteringer += result["count"]
+        elif result["_id"] == "udgift":
+            total_udgifter = result["total"]
+            antal_posteringer += result["count"]
     
     # Get startsaldo
     startsaldo = 0.0
@@ -359,7 +380,7 @@ async def get_dashboard_stats(
         aktuelt_saldo=aktuelt_saldo,
         total_indtaegter=total_indtaegter,
         total_udgifter=total_udgifter,
-        antal_posteringer=len(transactions)
+        antal_posteringer=antal_posteringer
     )
 
 # Excel export
