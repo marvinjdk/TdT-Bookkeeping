@@ -66,7 +66,7 @@ export default function DashboardPage({ user }) {
     <div className="p-4 md:p-6 lg:p-12 space-y-6" data-testid="dashboard-page">
       <div>
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">Dashboard</h1>
-        <p className="text-base md:text-lg text-slate-600 mt-2">Velkommen til {user.afdeling_navn || 'Bogføringsappen'}</p>
+        <p className="text-base md:text-lg text-slate-600 mt-2">Velkommen til {user.afdeling_navn || 'Tour de Taxa'}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
