@@ -12,8 +12,9 @@ export default function SettingsPage({ user }) {
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
     startsaldo: '',
-    periode_start: '01-10',
-    periode_slut: '30-09',
+    periode_start: '01-10-2024',
+    periode_slut: '30-09-2025',
+    regnskabsaar: '2024-2025',
   });
 
   useEffect(() => {
