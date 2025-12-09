@@ -100,23 +100,23 @@ export default function EditTransactionPage() {
   }
 
   return (
-    <div className="p-6 md:p-8 lg:p-12 space-y-8" data-testid="edit-transaction-page">
-      <div className="flex items-center gap-4">
+    <div className="p-4 md:p-6 lg:p-12 space-y-6" data-testid="edit-transaction-page">
+      <div className="flex items-center gap-3">
         <Button
           variant="ghost"
           onClick={() => navigate('/transactions')}
           data-testid="back-button"
-          className="hover:bg-slate-100"
+          className="hover:bg-slate-100 flex-shrink-0"
         >
           <ArrowLeft size={20} />
         </Button>
         <div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight">Rediger postering</h1>
-          <p className="text-lg text-slate-600 mt-2">Opdater posteringsoplysninger</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight">Rediger postering</h1>
+          <p className="text-sm md:text-base lg:text-lg text-slate-600 mt-1">Opdater posteringsoplysninger</p>
         </div>
       </div>
 
-      <Card className="bg-white border border-slate-100 shadow-sm max-w-3xl">
+      <Card className="bg-white border border-slate-100 shadow-sm w-full">
         <CardHeader>
           <CardTitle className="text-xl font-semibold">Posteringsoplysninger</CardTitle>
         </CardHeader>
