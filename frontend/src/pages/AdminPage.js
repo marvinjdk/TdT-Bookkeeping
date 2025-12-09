@@ -280,6 +280,17 @@ export default function AdminPage({ user }) {
                             <Eye size={16} />
                           </Button>
                         )}
+                        {currentUser.role === 'superbruger' && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleOpenPasswordDialog(user)}
+                            data-testid={`change-password-${user.id}`}
+                            className="hover:bg-blue-50 hover:text-blue-600"
+                          >
+                            <Key size={16} />
+                          </Button>
+                        )}
                         <Button
                           size="sm"
                           variant="ghost"
