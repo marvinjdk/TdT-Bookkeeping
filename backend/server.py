@@ -214,6 +214,29 @@ async def update_user_password(
         raise HTTPException(status_code=404, detail="Bruger ikke fundet")
     return {"success": True}
 
+@api_router.put("/admin/users/{user_id}/afdeling")
+async def update_user_afdeling(
+    user_id: str, 
+    afdeling_update: UserAfdelingUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != "superbruger":
+        raise HTTPException(status_code=403, detail="Kun superbruger kan ændre afdelingsnavn")
+    
+    # Check if user is an afdeling
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user or user.get("role") != "afdeling":
+        raise HTTPException(status_code=400, detail="Kun afdelinger kan få ændret navn")
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"afdeling_navn": afdeling_update.afdeling_navn}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Bruger ikke fundet")
+    return {"success": True}
+
 @api_router.get("/admin/settings/all")
 async def get_all_settings(current_user: User = Depends(get_current_user)):
     if current_user.role not in ["admin", "superbruger"]:
