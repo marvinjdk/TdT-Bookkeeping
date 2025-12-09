@@ -246,6 +246,49 @@ async def update_user_afdeling(
         raise HTTPException(status_code=404, detail="Bruger ikke fundet")
     return {"success": True}
 
+# Afdelinger endpoints
+@api_router.get("/admin/afdelinger", response_model=List[Afdeling])
+async def list_afdelinger(current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "superbruger"]:
+        raise HTTPException(status_code=403, detail="Kun admins kan se afdelinger")
+    
+    afdelinger = await db.afdelinger.find({}, {"_id": 0}).sort("navn", 1).to_list(1000)
+    return [Afdeling(**a) for a in afdelinger]
+
+@api_router.post("/admin/afdelinger", response_model=Afdeling)
+async def create_afdeling(afdeling: AfdelingCreate, current_user: User = Depends(get_current_user)):
+    if current_user.role != "superbruger":
+        raise HTTPException(status_code=403, detail="Kun superbruger kan oprette afdelinger")
+    
+    # Check if afdeling already exists
+    existing = await db.afdelinger.find_one({"navn": afdeling.navn}, {"_id": 0})
+    if existing:
+        raise HTTPException(status_code=400, detail="Afdeling findes allerede")
+    
+    afdeling_obj = Afdeling(navn=afdeling.navn)
+    await db.afdelinger.insert_one(afdeling_obj.model_dump())
+    return afdeling_obj
+
+@api_router.delete("/admin/afdelinger/{afdeling_id}")
+async def delete_afdeling(afdeling_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role != "superbruger":
+        raise HTTPException(status_code=403, detail="Kun superbruger kan slette afdelinger")
+    
+    # Check if any users are using this afdeling
+    users_with_afdeling = await db.users.find_one({"afdeling_navn": {"$exists": True}}, {"_id": 0})
+    afdeling_to_delete = await db.afdelinger.find_one({"id": afdeling_id}, {"_id": 0})
+    
+    if afdeling_to_delete and users_with_afdeling:
+        # Check if this specific afdeling name is in use
+        in_use = await db.users.find_one({"afdeling_navn": afdeling_to_delete["navn"]}, {"_id": 0})
+        if in_use:
+            raise HTTPException(status_code=400, detail="Kan ikke slette afdeling der er i brug")
+    
+    result = await db.afdelinger.delete_one({"id": afdeling_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Afdeling ikke fundet")
+    return {"success": True}
+
 @api_router.get("/admin/settings/all")
 async def get_all_settings(current_user: User = Depends(get_current_user)):
     if current_user.role not in ["admin", "superbruger"]:
