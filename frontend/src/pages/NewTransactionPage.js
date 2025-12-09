@@ -90,13 +90,13 @@ export default function NewTransactionPage() {
         </div>
       </div>
 
-      <Card className="bg-white border border-slate-100 shadow-sm max-w-3xl">
+      <Card className="bg-white border border-slate-100 shadow-sm w-full">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold">Posteringsoplysninger</CardTitle>
+          <CardTitle className="text-lg md:text-xl font-semibold">Posteringsoplysninger</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="bilagnr" className="text-slate-700 font-medium">Bilagnr. *</Label>
                 <Input
