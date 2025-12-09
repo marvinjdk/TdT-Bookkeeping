@@ -253,10 +253,11 @@ export default function AdminPage({ user }) {
                     <TableCell>
                       <span
                         className={`px-2 py-1 rounded text-xs font-medium ${
+                          user.role === 'superbruger' ? 'bg-green-50 text-green-700' :
                           user.role === 'admin' ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'
                         }`}
                       >
-                        {user.role === 'admin' ? 'Admin' : 'Afdeling'}
+                        {user.role === 'superbruger' ? 'Superbruger' : user.role === 'admin' ? 'Admin' : 'Afdeling'}
                       </span>
                     </TableCell>
                     <TableCell>{user.afdeling_navn || '-'}</TableCell>
