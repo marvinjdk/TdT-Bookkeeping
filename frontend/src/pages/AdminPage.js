@@ -131,15 +131,17 @@ export default function AdminPage({ user }) {
           <p className="text-base md:text-lg text-slate-600 mt-2">Administrer brugere og afdelinger</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <Button
-            onClick={() => navigate('/admin/settings')}
-            variant="outline"
-            className="border-[#109848] text-[#109848] hover:bg-[#109848]/10 w-full sm:w-auto"
-            data-testid="admin-settings-button"
-          >
-            <Settings size={18} className="mr-2" />
-            Hold Indstillinger
-          </Button>
+          {currentUser.role === 'admin' && (
+            <Button
+              onClick={() => navigate('/admin/settings')}
+              variant="outline"
+              className="border-[#109848] text-[#109848] hover:bg-[#109848]/10 w-full sm:w-auto"
+              data-testid="admin-settings-button"
+            >
+              <Settings size={18} className="mr-2" />
+              Hold Indstillinger
+            </Button>
+          )}
           <Dialog open={showDialog} onOpenChange={setShowDialog}>
           <DialogTrigger asChild>
             <Button
