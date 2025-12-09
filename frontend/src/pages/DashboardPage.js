@@ -104,6 +104,221 @@ export default function DashboardPage({ user }) {
     return <div className="p-8">Indlæser...</div>;
   }
 
+  // Superbruger dashboard - only user management
+  if (isSuperbruger) {
+    const activeUsers = users.filter(u => u.role !== 'superbruger').length;
+    
+    return (
+      <div className="p-4 md:p-6 lg:p-12 space-y-6" data-testid="dashboard-page">
+        <div>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">Superbruger Dashboard</h1>
+          <p className="text-base md:text-lg text-slate-600 mt-2">Administrer brugere og adgange</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card className="bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-slate-600">Aktive Brugere</CardTitle>
+              <div className="p-2 rounded-lg bg-[#109848]/10">
+                <UsersIcon className="w-5 h-5 text-[#109848]" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold font-data text-[#109848]">{activeUsers}</div>
+              <p className="text-xs text-slate-500 mt-1">Admins og afdelinger</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white border border-slate-100 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-sm font-medium text-slate-600">Hurtig Adgang</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                <DialogTrigger asChild>
+                  <Button className="w-full bg-[#109848] hover:bg-[#0d7a3a] text-white">
+                    <Plus size={18} className="mr-2" />
+                    Opret Ny Bruger
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-white">
+                  <DialogHeader>
+                    <DialogTitle>Opret ny bruger</DialogTitle>
+                    <DialogDescription>Tilføj en ny admin eller afdeling bruger</DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleCreateUser} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="username">Brugernavn *</Label>
+                      <Input
+                        id="username"
+                        value={formData.username}
+                        onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                        className="bg-white border-slate-200 focus:border-[#109848]"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="password">Adgangskode *</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        className="bg-white border-slate-200 focus:border-[#109848]"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="role">Rolle *</Label>
+                      <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
+                        <SelectTrigger id="role">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent position="popper">
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="afdeling">Afdeling</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {formData.role === 'afdeling' && (
+                      <div className="space-y-2">
+                        <Label htmlFor="afdeling_navn">Afdelingsnavn *</Label>
+                        <Select
+                          value={formData.afdeling_navn}
+                          onValueChange={(value) => setFormData({ ...formData, afdeling_navn: value })}
+                        >
+                          <SelectTrigger id="afdeling_navn">
+                            <SelectValue placeholder="Vælg afdeling" />
+                          </SelectTrigger>
+                          <SelectContent position="popper" className="max-h-[300px] overflow-y-auto">
+                            {AFDELINGER.map((afdeling) => (
+                              <SelectItem key={afdeling} value={afdeling}>
+                                {afdeling}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                    <Button
+                      type="submit"
+                      className="w-full bg-[#109848] hover:bg-[#0d7a3a] text-white"
+                    >
+                      Opret bruger
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+              
+              <Button
+                onClick={() => navigate('/admin')}
+                variant="outline"
+                className="w-full border-slate-200 hover:bg-slate-50"
+              >
+                Se Alle Brugere
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="bg-white border border-slate-100 shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">Brugeroversigt</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50 border-b border-slate-200">
+                    <TableHead className="font-semibold text-slate-700">Brugernavn</TableHead>
+                    <TableHead className="font-semibold text-slate-700">Rolle</TableHead>
+                    <TableHead className="font-semibold text-slate-700">Afdeling</TableHead>
+                    <TableHead className="font-semibold text-slate-700 text-right">Handling</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {users.filter(u => u.role !== 'superbruger').map((user) => (
+                    <TableRow
+                      key={user.id}
+                      className="hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-0"
+                    >
+                      <TableCell className="font-medium">{user.username}</TableCell>
+                      <TableCell>
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-medium ${
+                            user.role === 'admin' ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'
+                          }`}
+                        >
+                          {user.role === 'admin' ? 'Admin' : 'Afdeling'}
+                        </span>
+                      </TableCell>
+                      <TableCell>{user.afdeling_navn || '-'}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setNewPassword('');
+                            setShowPasswordDialog(true);
+                          }}
+                          className="hover:bg-blue-50 hover:text-blue-600"
+                        >
+                          <Key size={16} />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Password Change Dialog */}
+        <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+          <DialogContent className="bg-white">
+            <DialogHeader>
+              <DialogTitle>Skift Password</DialogTitle>
+              <DialogDescription>
+                Skift password for bruger: {selectedUser?.username}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-password">Nyt Password *</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="bg-white border-slate-200 focus:border-[#109848]"
+                  placeholder="Mindst 6 tegn"
+                />
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleChangePassword}
+                  className="flex-1 bg-[#109848] hover:bg-[#0d7a3a] text-white"
+                >
+                  <Key size={18} className="mr-2" />
+                  Gem Password
+                </Button>
+                <Button
+                  onClick={() => setShowPasswordDialog(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Annuller
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
+
   const isAdmin = user.role === 'admin' || user.role === 'superbruger';
   
   const statCards = isAdmin ? [
