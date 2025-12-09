@@ -1,18 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '@/App';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { Download } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function ExportPage({ user }) {
   const [loading, setLoading] = useState(false);
+  const [afdelinger, setAfdelinger] = useState([]);
+  const [selectedAfdeling, setSelectedAfdeling] = useState('all');
+
+  useEffect(() => {
+    if (user.role === 'admin') {
+      fetchAfdelinger();
+    }
+  }, [user]);
+
+  const fetchAfdelinger = async () => {
+    try {
+      const res = await api.get('/admin/users');
+      const afdelingUsers = res.data.filter(u => u.role === 'afdeling');
+      setAfdelinger(afdelingUsers);
+    } catch (error) {
+      console.error('Kunne ikke hente afdelinger');
+    }
+  };
 
   const handleExport = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
       const params = new URLSearchParams();
+      
+      if (selectedAfdeling !== 'all') {
+        params.append('afdeling_id', selectedAfdeling);
+      }
       
       const response = await fetch(`${api.defaults.baseURL}/export/excel?${params}`, {
         method: 'GET',
@@ -27,7 +51,10 @@ export default function ExportPage({ user }) {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `bogforing_${new Date().toISOString().split('T')[0]}.xlsx`;
+      const filename = selectedAfdeling === 'all' 
+        ? `tour_de_taxa_alle_hold_${new Date().toISOString().split('T')[0]}.xlsx`
+        : `tour_de_taxa_${new Date().toISOString().split('T')[0]}.xlsx`;
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
