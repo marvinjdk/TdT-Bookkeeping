@@ -36,6 +36,7 @@ export default function AdminPage({ user }) {
   });
   const [stats, setStats] = useState({});
   const navigate = useNavigate();
+  const currentUser = user; // Rename for clarity
 
   useEffect(() => {
     fetchUsers();
