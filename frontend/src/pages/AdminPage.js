@@ -147,6 +147,37 @@ export default function AdminPage({ user }) {
     }
   };
 
+  const handleCreateAfdeling = async () => {
+    if (!newAfdelingCreate || newAfdelingCreate.trim().length === 0) {
+      toast.error('Afdelingsnavn skal udfyldes');
+      return;
+    }
+
+    try {
+      await api.post('/admin/afdelinger', {
+        navn: newAfdelingCreate,
+      });
+      toast.success('Afdeling oprettet!');
+      setShowNewAfdelingDialog(false);
+      setNewAfdelingCreate('');
+      fetchAfdelinger();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Kunne ikke oprette afdeling');
+    }
+  };
+
+  const handleDeleteAfdeling = async (afdelingId) => {
+    if (!window.confirm('Er du sikker på, at du vil slette denne afdeling?')) return;
+
+    try {
+      await api.delete(`/admin/afdelinger/${afdelingId}`);
+      toast.success('Afdeling slettet');
+      fetchAfdelinger();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Kunne ikke slette afdeling');
+    }
+  };
+
   const viewAfdelingTransactions = (afdelingId) => {
     navigate(`/transactions?afdeling_id=${afdelingId}`);
   };
