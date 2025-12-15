@@ -11,10 +11,13 @@ export default function ExportPage({ user }) {
   const [loading, setLoading] = useState(false);
   const [afdelinger, setAfdelinger] = useState([]);
   const [selectedAfdeling, setSelectedAfdeling] = useState('all');
+  const [regnskabsaarList, setRegnskabsaarList] = useState([]);
+  const [selectedRegnskabsaar, setSelectedRegnskabsaar] = useState('current');
 
   useEffect(() => {
     if (user.role === 'admin') {
       fetchAfdelinger();
+      fetchRegnskabsaar();
     }
   }, [user]);
 
@@ -25,6 +28,15 @@ export default function ExportPage({ user }) {
       setAfdelinger(afdelingUsers);
     } catch (error) {
       console.error('Kunne ikke hente afdelinger');
+    }
+  };
+
+  const fetchRegnskabsaar = async () => {
+    try {
+      const res = await api.get('/historik/regnskabsaar');
+      setRegnskabsaarList(res.data.regnskabsaar || []);
+    } catch (error) {
+      console.error('Kunne ikke hente regnskabsår');
     }
   };
 
