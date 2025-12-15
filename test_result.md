@@ -225,7 +225,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All department management tasks completed"
+    - "Admin Dashboard Total Balance Summary Card"
+    - "Admin Dashboard All Afdelinger Table"
+    - "User Authentication"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
