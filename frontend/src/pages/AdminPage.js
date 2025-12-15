@@ -31,13 +31,24 @@ export default function AdminPage({ user }) {
     afdeling_navn: '',
   });
   const [stats, setStats] = useState({});
+  const [allAfdelingerStats, setAllAfdelingerStats] = useState(null);
   const navigate = useNavigate();
   const currentUser = user; // Rename for clarity
 
   useEffect(() => {
     fetchUsers();
     fetchAfdelinger();
+    fetchAllAfdelingerStats();
   }, []);
+
+  const fetchAllAfdelingerStats = async () => {
+    try {
+      const res = await api.get('/dashboard/stats');
+      setAllAfdelingerStats(res.data);
+    } catch (error) {
+      console.error('Kunne ikke hente samlet statistik');
+    }
+  };
 
   const fetchUsers = async () => {
     try {
