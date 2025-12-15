@@ -427,6 +427,13 @@ async def create_transaction(transaction: TransactionCreate, current_user: User 
     
     trans_dict = transaction.model_dump()
     trans_dict["bilagnr"] = bilagnr
+    
+    # Automatically assign regnskabsaar from settings
+    if settings:
+        trans_dict["regnskabsaar"] = settings.get("regnskabsaar", "2024-2025")
+    else:
+        trans_dict["regnskabsaar"] = "2024-2025"
+    
     trans_obj = Transaction(afdeling_id=current_user.id, **trans_dict)
     await db.transactions.insert_one(trans_obj.model_dump())
     return trans_obj
