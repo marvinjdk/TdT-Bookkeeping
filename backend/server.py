@@ -696,16 +696,19 @@ async def export_excel(
         # Create sheet for each afdeling
         all_transactions = []
         for afdeling in afdelinger:
-            await create_afdeling_sheet(wb, afdeling["id"], afdeling["afdeling_navn"])
+            await create_afdeling_sheet(wb, afdeling["id"], afdeling["afdeling_navn"], regnskabsaar)
+            
+            # Build query with optional regnskabsaar filter
+            query = {"afdeling_id": afdeling["id"]}
+            if regnskabsaar:
+                query["regnskabsaar"] = regnskabsaar
             
             # Collect for combined sheet
             projection = {
                 "_id": 0, "bilagnr": 1, "bank_dato": 1, 
                 "tekst": 1, "formal": 1, "belob": 1, "type": 1, "afdeling_id": 1
             }
-            trans = await db.transactions.find(
-                {"afdeling_id": afdeling["id"]}, projection
-            ).sort("bank_dato", 1).to_list(10000)
+            trans = await db.transactions.find(query, projection).sort("bank_dato", 1).to_list(10000)
             
             for t in trans:
                 t["afdeling_navn"] = afdeling["afdeling_navn"]
