@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the department management (afdeling-administration) functionality for the Tour de Taxa bookkeeping app"
+user_problem_statement: "Test the new Admin dashboard features for the Tour de Taxa bookkeeping app - specifically the total combined balance summary card and the table showing ALL afdelinger with their current balances"
 
 frontend:
   - task: "Department Management UI"
