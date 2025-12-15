@@ -441,6 +441,7 @@ async def create_transaction(transaction: TransactionCreate, current_user: User 
 @api_router.get("/transactions", response_model=List[Transaction])
 async def list_transactions(
     afdeling_id: Optional[str] = None,
+    regnskabsaar: Optional[str] = None,
     current_user: User = Depends(get_current_user)
 ):
     query = {}
@@ -449,10 +450,14 @@ async def list_transactions(
     elif current_user.role == "admin" and afdeling_id:
         query["afdeling_id"] = afdeling_id
     
+    # Filter by regnskabsaar if provided (admin only)
+    if regnskabsaar and current_user.role in ["admin", "superbruger"]:
+        query["regnskabsaar"] = regnskabsaar
+    
     projection = {
         "_id": 0, "id": 1, "afdeling_id": 1, "bilagnr": 1, 
         "bank_dato": 1, "tekst": 1, "formal": 1, "belob": 1, 
-        "type": 1, "kvittering_url": 1, "oprettet": 1
+        "type": 1, "regnskabsaar": 1, "kvittering_url": 1, "oprettet": 1
     }
     transactions = await db.transactions.find(query, projection).sort("bank_dato", -1).to_list(1000)
     return [Transaction(**t) for t in transactions]
