@@ -174,6 +174,7 @@ export default function AdminPage({ user }) {
       setShowNewAfdelingDialog(false);
       setNewAfdelingCreate('');
       fetchAfdelinger();
+      fetchAllAfdelingerStats();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Kunne ikke oprette afdeling');
     }
@@ -186,6 +187,7 @@ export default function AdminPage({ user }) {
       await api.delete(`/admin/afdelinger/${afdelingId}`);
       toast.success('Afdeling slettet');
       fetchAfdelinger();
+      fetchAllAfdelingerStats();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Kunne ikke slette afdeling');
     }
