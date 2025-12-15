@@ -749,7 +749,7 @@ async def export_excel(
         afdeling_navn = afdeling_user.get("afdeling_navn", "Bogføring") if afdeling_user else "Bogføring"
         
         wb.remove(wb.active)
-        await create_afdeling_sheet(wb, target_afdeling_id, afdeling_navn)
+        await create_afdeling_sheet(wb, target_afdeling_id, afdeling_navn, regnskabsaar)
     
     # Save to bytes
     output = io.BytesIO()
