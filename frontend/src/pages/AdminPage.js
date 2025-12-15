@@ -90,6 +90,7 @@ export default function AdminPage({ user }) {
       setShowDialog(false);
       setFormData({ username: '', password: '', role: 'afdeling', afdeling_navn: '' });
       fetchUsers();
+      fetchAllAfdelingerStats();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Kunne ikke oprette bruger');
     }
@@ -102,6 +103,7 @@ export default function AdminPage({ user }) {
       await api.delete(`/admin/users/${id}`);
       toast.success('Bruger slettet');
       fetchUsers();
+      fetchAllAfdelingerStats();
     } catch (error) {
       toast.error('Kunne ikke slette bruger');
     }
