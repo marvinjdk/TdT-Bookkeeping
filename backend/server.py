@@ -680,6 +680,7 @@ async def get_dashboard_stats(
 @api_router.get("/export/excel")
 async def export_excel(
     afdeling_id: Optional[str] = None,
+    regnskabsaar: Optional[str] = None,
     current_user: User = Depends(get_current_user)
 ):
     wb = Workbook()
