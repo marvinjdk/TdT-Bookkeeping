@@ -107,7 +107,7 @@ user_problem_statement: "Test the department management (afdeling-administration
 frontend:
   - task: "Department Management UI"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/pages/AdminPage.js"
     stuck_count: 0
     priority: "high"
@@ -116,6 +116,9 @@ frontend:
         - working: false
           agent: "testing"
           comment: "Department management functionality exists in code but is only accessible to superuser role. Admin role cannot access 'Administrer Afdelinger' button. Superuser credentials (superuser/super123) are not working - returns 401 error."
+        - working: true
+          agent: "testing"
+          comment: "RESOLVED: Department management functionality working correctly with correct superuser credentials (superbruger/super123). 'Administrer Afdelinger' button accessible to superuser role. Dialog opens successfully showing existing departments with create/delete functionality."
         
   - task: "User Authentication"
     implemented: true
@@ -128,6 +131,9 @@ frontend:
         - working: true
           agent: "testing"
           comment: "Login functionality works correctly. Admin credentials (admin/admin123) work successfully. Superuser credentials (superuser/super123) fail with 401 error."
+        - working: true
+          agent: "testing"
+          comment: "CONFIRMED: Login functionality working correctly. Correct superuser credentials are 'superbruger/super123' (not 'superuser/super123'). Authentication successful with proper credentials."
 
   - task: "User Creation with Department Selection"
     implemented: true
@@ -140,6 +146,9 @@ frontend:
         - working: true
           agent: "testing"
           comment: "User creation dialog works correctly. When role is set to 'Afdeling', department dropdown appears and is populated with existing departments: Himmerland, Syd/Sønderjylland & Fyn, Vest- & Sydsjælland, Hovedstaden, Barcelona-Paris."
+        - working: true
+          agent: "testing"
+          comment: "CONFIRMED: User creation with department selection working perfectly. Department dropdown appears when role set to 'Afdeling' and shows 8 departments: Explore, Himmerland, Hovedstaden Barcelona-Paris, Nordsjælland & Hovedstadsområdet, Syd/Sønderjylland & Fyn, Test Afdeling XYZ, Vest- & Sydsjælland, Øst- & Midtjylland."
 
   - task: "Department List Display"
     implemented: true
@@ -152,6 +161,21 @@ frontend:
         - working: true
           agent: "testing"
           comment: "Existing departments are visible in the user overview table. Multiple departments found: Himmerland, Syd/Sønderjylland & Fyn, Vest- & Sydsjælland, Hovedstaden, Barcelona-Paris."
+        - working: true
+          agent: "testing"
+          comment: "CONFIRMED: Department list display working correctly. Departments visible in both user overview table and department management dialog."
+
+  - task: "Department CRUD Operations"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/AdminPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Department CRUD operations tested successfully. CREATE: Successfully created 'Test Afdeling XYZ' department. DELETE: Successfully deleted test department. Department management dialog shows all existing departments with delete buttons. Minor: Modal overlay issues prevent some interactions but core functionality works."
 
 backend:
   - task: "Superuser Authentication"
