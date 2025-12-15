@@ -315,6 +315,72 @@ export default function AdminPage({ user }) {
         </div>
       </div>
 
+      {/* Samlet saldo for alle hold */}
+      {allAfdelingerStats && (
+        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 shadow-md">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-green-700 mb-1">Samlet nuværende saldo for alle hold</p>
+                <p className="text-3xl md:text-4xl font-bold text-green-900">
+                  {allAfdelingerStats.aktuelt_saldo.toFixed(2)} kr.
+                </p>
+              </div>
+              <div className="flex gap-6 text-sm">
+                <div className="text-center">
+                  <p className="text-slate-600 font-medium mb-1">Total Indtægter</p>
+                  <p className="text-lg font-semibold text-green-700">
+                    {allAfdelingerStats.total_indtaegter.toFixed(2)} kr.
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-slate-600 font-medium mb-1">Total Udgifter</p>
+                  <p className="text-lg font-semibold text-red-600">
+                    {allAfdelingerStats.total_udgifter.toFixed(2)} kr.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Alle afdelinger med saldi */}
+      {allAfdelingerStats && allAfdelingerStats.afdelinger_saldi && allAfdelingerStats.afdelinger_saldi.length > 0 && (
+        <Card className="bg-white border border-slate-100 shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">Alle Hold - Saldi</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50 border-b border-slate-200">
+                    <TableHead className="font-semibold text-slate-700">Afdeling</TableHead>
+                    <TableHead className="font-semibold text-slate-700 text-right">Nuværende Saldo</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {allAfdelingerStats.afdelinger_saldi.map((afdeling) => (
+                    <TableRow
+                      key={afdeling.afdeling_id}
+                      className="hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-0"
+                    >
+                      <TableCell className="font-medium">{afdeling.afdeling_navn}</TableCell>
+                      <TableCell className="text-right font-data">
+                        <span className={afdeling.aktuelt_saldo >= 0 ? 'text-green-700' : 'text-red-600'}>
+                          {afdeling.aktuelt_saldo.toFixed(2)} kr.
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card className="bg-white border border-slate-100 shadow-sm">
         <CardHeader>
           <CardTitle className="text-xl font-semibold">Brugeroversigt</CardTitle>
