@@ -119,6 +119,9 @@ frontend:
         - working: true
           agent: "testing"
           comment: "✅ VERIFIED: Total balance summary card working perfectly. Shows 'Samlet nuværende saldo for alle hold: 7700.00 kr.', 'Total Indtægter: 1000.00 kr.', and 'Total Udgifter: 300.00 kr.' All values display correctly with proper styling and layout."
+        - working: true
+          agent: "testing"
+          comment: "✅ RE-VERIFIED ON BOTH PAGES: Dashboard page shows 'Samlet nuværende saldo for alle hold' card with 7700.00 kr., Total Indtægter: 1000.00 kr., Total Udgifter: 300.00 kr. Admin page shows identical card with same values. Both pages display correctly for admin users. Screenshots captured: dashboard_page_admin.png and admin_page_features.png."
           
   - task: "Admin Dashboard All Afdelinger Table"
     implemented: true
