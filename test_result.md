@@ -234,9 +234,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Admin Dashboard Total Balance Summary Card"
-    - "Admin Dashboard All Afdelinger Table"
-    - "User Authentication"
+    - "All new admin dashboard features successfully tested and verified"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
