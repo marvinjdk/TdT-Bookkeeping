@@ -567,8 +567,13 @@ async def get_dashboard_stats(
             # Use the afdeling_id from the user, or the afdeling id itself
             afdeling_id_for_query = user_with_afdeling["id"] if user_with_afdeling else afdeling["id"]
             
+            # Build match query with optional regnskabsaar filter
+            match_query = {"afdeling_id": afdeling_id_for_query}
+            if regnskabsaar:
+                match_query["regnskabsaar"] = regnskabsaar
+            
             pipeline = [
-                {"$match": {"afdeling_id": afdeling_id_for_query}},
+                {"$match": match_query},
                 {
                     "$group": {
                         "_id": "$type",
