@@ -759,7 +759,7 @@ async def export_excel(
         headers={"Content-Disposition": "attachment; filename=tour_de_taxa_bogforing.xlsx"}
     )
 
-async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn):
+async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn, regnskabsaar=None):
     """Create a sheet for a specific afdeling with startsaldo and aktuel saldo"""
     # Clean sheet name - remove invalid characters and limit to 31 chars
     clean_name = afdeling_navn.replace("/", "-").replace("\\", "-").replace("[", "").replace("]", "")
@@ -770,14 +770,17 @@ async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn):
     settings = await db.settings.find_one({"afdeling_id": afdeling_id}, {"_id": 0})
     startsaldo = settings.get("startsaldo", 0.0) if settings else 0.0
     
+    # Build query with optional regnskabsaar filter
+    query = {"afdeling_id": afdeling_id}
+    if regnskabsaar:
+        query["regnskabsaar"] = regnskabsaar
+    
     # Get transactions
     projection = {
         "_id": 0, "bilagnr": 1, "bank_dato": 1, 
         "tekst": 1, "formal": 1, "belob": 1, "type": 1
     }
-    transactions = await db.transactions.find(
-        {"afdeling_id": afdeling_id}, projection
-    ).sort("bank_dato", 1).to_list(10000)
+    transactions = await db.transactions.find(query, projection).sort("bank_dato", 1).to_list(10000)
     
     # Calculate sums
     total_indtaegter = sum(t["belob"] for t in transactions if t["type"] == "indtaegt")
