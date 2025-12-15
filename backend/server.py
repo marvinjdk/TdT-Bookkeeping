@@ -107,6 +107,7 @@ class Transaction(BaseModel):
     formal: str
     belob: float
     type: str
+    regnskabsaar: Optional[str] = None
     kvittering_url: Optional[str] = None
     oprettet: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
