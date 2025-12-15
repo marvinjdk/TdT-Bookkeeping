@@ -381,6 +381,36 @@ export default function DashboardPage({ user }) {
         <p className="text-base md:text-lg text-slate-600 mt-2">Velkommen til {user.afdeling_navn || 'Tour de Taxa'}</p>
       </div>
 
+      {/* Samlet saldo for alle hold (kun for admin) */}
+      {isAdmin && stats.aktuelt_saldo !== undefined && stats.aktuelt_saldo !== null && (
+        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 shadow-md">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-green-700 mb-1">Samlet nuværende saldo for alle hold</p>
+                <p className="text-3xl md:text-4xl font-bold text-green-900">
+                  {stats.aktuelt_saldo.toFixed(2)} kr.
+                </p>
+              </div>
+              <div className="flex gap-6 text-sm">
+                <div className="text-center">
+                  <p className="text-slate-600 font-medium mb-1">Total Indtægter</p>
+                  <p className="text-lg font-semibold text-green-700">
+                    {stats.total_indtaegter.toFixed(2)} kr.
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-slate-600 font-medium mb-1">Total Udgifter</p>
+                  <p className="text-lg font-semibold text-red-600">
+                    {stats.total_udgifter.toFixed(2)} kr.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {statCards.map((stat) => {
           const Icon = stat.icon;
