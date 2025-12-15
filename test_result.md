@@ -137,6 +137,9 @@ frontend:
         - working: true
           agent: "testing"
           comment: "✅ VERIFIED: 'Alle Hold - Saldi' table working perfectly. Shows all 7 expected departments including those without users: Himmerland (7700.00 kr.), Vest- & Sydsjælland (0.00 kr.), Syd/Sønderjylland & Fyn (0.00 kr.), Øst- & Midtjylland (0.00 kr.), Hovedstaden Barcelona-Paris (0.00 kr.), Nordsjælland & Hovedstadsområdet (0.00 kr.), and Explore (0.00 kr.). All departments display with correct balances."
+        - working: true
+          agent: "testing"
+          comment: "✅ RE-VERIFIED: Dashboard page 'Hold Oversigt' section shows all 7 departments with correct balances. Admin page 'Alle Hold - Saldi' table shows identical 7 departments: Himmerland (7700.00 kr.), Vest- & Sydsjælland (0.00 kr.), Syd/Sønderjylland & Fyn (0.00 kr.), Øst- & Midtjylland (0.00 kr.), Hovedstaden, Barcelona-Paris (0.00 kr.), Nordsjælland & Hovedstadsområdet (0.00 kr.), and Explore (0.00 kr.). Both sections working perfectly for admin users."
         
   - task: "User Authentication"
     implemented: true
