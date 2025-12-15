@@ -240,7 +240,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All new admin dashboard features successfully tested and verified"
+    - "All admin dashboard features verified on both Dashboard and Admin pages"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
