@@ -630,6 +630,10 @@ async def get_dashboard_stats(
             target_afdeling_id = afdeling_id
             query["afdeling_id"] = afdeling_id
         
+        # Add regnskabsaar filter if provided
+        if regnskabsaar:
+            query["regnskabsaar"] = regnskabsaar
+        
         # Use aggregation pipeline for efficient calculation
         pipeline = [
             {"$match": query},
