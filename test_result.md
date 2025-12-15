@@ -180,27 +180,33 @@ frontend:
 backend:
   - task: "Superuser Authentication"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
         - working: false
           agent: "testing"
           comment: "Superuser authentication fails. Credentials 'superuser/super123' return 401 error. Multiple password attempts failed: superbruger123, password, 123456, superbruger. This prevents testing of department management functionality."
+        - working: true
+          agent: "testing"
+          comment: "RESOLVED: Superuser authentication working correctly with proper credentials 'superbruger/super123'. Previous issue was using incorrect username 'superuser' instead of 'superbruger'."
 
   - task: "Department Management API"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "testing"
           comment: "Cannot test department management API endpoints (create/delete departments) because superuser authentication is failing. API endpoints appear to exist based on frontend code."
+        - working: true
+          agent: "testing"
+          comment: "CONFIRMED: Department management API endpoints working correctly. Successfully tested CREATE department (Test Afdeling XYZ created) and DELETE department (test department removed). API calls return proper responses and update database correctly."
 
 metadata:
   created_by: "testing_agent"
