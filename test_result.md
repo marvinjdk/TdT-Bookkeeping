@@ -105,20 +105,29 @@
 user_problem_statement: "Test the new Admin dashboard features for the Tour de Taxa bookkeeping app - specifically the total combined balance summary card and the table showing ALL afdelinger with their current balances"
 
 frontend:
-  - task: "Department Management UI"
+  - task: "Admin Dashboard Total Balance Summary Card"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/frontend/src/pages/AdminPage.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
-        - working: false
+        - working: "NA"
           agent: "testing"
-          comment: "Department management functionality exists in code but is only accessible to superuser role. Admin role cannot access 'Administrer Afdelinger' button. Superuser credentials (superuser/super123) are not working - returns 401 error."
-        - working: true
+          comment: "New task: Need to test the total combined balance summary card that shows 'Samlet nuværende saldo for alle hold' with total income and expenses."
+          
+  - task: "Admin Dashboard All Afdelinger Table"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
           agent: "testing"
-          comment: "RESOLVED: Department management functionality working correctly with correct superuser credentials (superbruger/super123). 'Administrer Afdelinger' button accessible to superuser role. Dialog opens successfully showing existing departments with create/delete functionality."
+          comment: "New task: Need to test the 'Alle Hold - Saldi' table that shows ALL departments (even those without users) with their current balances."
         
   - task: "User Authentication"
     implemented: true
