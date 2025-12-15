@@ -50,6 +50,10 @@ export default function ExportPage({ user }) {
         params.append('afdeling_id', selectedAfdeling);
       }
       
+      if (selectedRegnskabsaar && selectedRegnskabsaar !== 'current') {
+        params.append('regnskabsaar', selectedRegnskabsaar);
+      }
+      
       const response = await fetch(`${api.defaults.baseURL}/export/excel?${params}`, {
         method: 'GET',
         headers: {
