@@ -101,22 +101,41 @@ export default function ExportPage({ user }) {
           </p>
 
           {user.role === 'admin' && (
-            <div className="space-y-2">
-              <Label htmlFor="afdeling-select" className="text-slate-700 font-medium">Vælg hold</Label>
-              <Select value={selectedAfdeling} onValueChange={setSelectedAfdeling}>
-                <SelectTrigger id="afdeling-select" data-testid="afdeling-select">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  <SelectItem value="all">Alle hold (separate ark)</SelectItem>
-                  {afdelinger.map((afd) => (
-                    <SelectItem key={afd.id} value={afd.id}>
-                      {afd.afdeling_navn}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="regnskabsaar-select" className="text-slate-700 font-medium">Vælg regnskabsår</Label>
+                <Select value={selectedRegnskabsaar} onValueChange={setSelectedRegnskabsaar}>
+                  <SelectTrigger id="regnskabsaar-select" data-testid="regnskabsaar-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="current">Nuværende periode</SelectItem>
+                    {regnskabsaarList.map((aar) => (
+                      <SelectItem key={aar} value={aar}>
+                        {aar}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="afdeling-select" className="text-slate-700 font-medium">Vælg hold</Label>
+                <Select value={selectedAfdeling} onValueChange={setSelectedAfdeling}>
+                  <SelectTrigger id="afdeling-select" data-testid="afdeling-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="all">Alle hold (separate ark)</SelectItem>
+                    {afdelinger.map((afd) => (
+                      <SelectItem key={afd.id} value={afd.id}>
+                        {afd.afdeling_navn}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </>
           )}
           
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
