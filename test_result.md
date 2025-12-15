@@ -149,6 +149,9 @@ frontend:
         - working: true
           agent: "testing"
           comment: "CONFIRMED: Login functionality working correctly. Correct superuser credentials are 'superbruger/super123' (not 'superuser/super123'). Authentication successful with proper credentials."
+        - working: true
+          agent: "testing"
+          comment: "✅ RE-VERIFIED: Admin login (admin/admin123) working perfectly for new dashboard testing. Authentication successful and redirects to dashboard correctly."
 
   - task: "User Creation with Department Selection"
     implemented: true
