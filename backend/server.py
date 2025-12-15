@@ -543,6 +543,7 @@ async def upload_receipt(
 @api_router.get("/dashboard/stats", response_model=DashboardStats)
 async def get_dashboard_stats(
     afdeling_id: Optional[str] = None,
+    regnskabsaar: Optional[str] = None,
     current_user: User = Depends(get_current_user)
 ):
     # Admin sees all afdelinger with their saldi
