@@ -515,17 +515,27 @@ async def get_dashboard_stats(
 ):
     # Admin sees all afdelinger with their saldi
     if current_user.role in ["admin", "superbruger"] and not afdeling_id:
-        # Get all afdelinger
-        afdelinger = await db.users.find({"role": "afdeling"}, {"_id": 0}).to_list(100)
+        # Get all afdelinger from the afdelinger collection (not just users)
+        afdelinger = await db.afdelinger.find({}, {"_id": 0}).to_list(100)
         
         afdelinger_saldi = []
         total_indtaegter_all = 0.0
         total_udgifter_all = 0.0
+        total_startsaldo_all = 0.0
         
         for afdeling in afdelinger:
-            # Get transactions for this afdeling
+            # Get transactions for this afdeling (match by navn)
+            # First, find any user with this afdeling_navn to get the afdeling_id used in transactions
+            user_with_afdeling = await db.users.find_one(
+                {"afdeling_navn": afdeling["navn"], "role": "afdeling"}, 
+                {"_id": 0, "id": 1}
+            )
+            
+            # Use the afdeling_id from the user, or the afdeling id itself
+            afdeling_id_for_query = user_with_afdeling["id"] if user_with_afdeling else afdeling["id"]
+            
             pipeline = [
-                {"$match": {"afdeling_id": afdeling["id"]}},
+                {"$match": {"afdeling_id": afdeling_id_for_query}},
                 {
                     "$group": {
                         "_id": "$type",
@@ -546,21 +556,26 @@ async def get_dashboard_stats(
                     udgifter = result["total"]
             
             # Get startsaldo
-            settings = await db.settings.find_one({"afdeling_id": afdeling["id"]}, {"_id": 0})
+            settings = await db.settings.find_one({"afdeling_id": afdeling_id_for_query}, {"_id": 0})
             startsaldo = settings.get("startsaldo", 0.0) if settings else 0.0
             
             aktuelt_saldo = startsaldo + indtaegter - udgifter
             
             afdelinger_saldi.append(AfdelingSaldo(
                 afdeling_id=afdeling["id"],
-                afdeling_navn=afdeling["afdeling_navn"],
+                afdeling_navn=afdeling["navn"],
                 aktuelt_saldo=aktuelt_saldo
             ))
             
             total_indtaegter_all += indtaegter
             total_udgifter_all += udgifter
+            total_startsaldo_all += startsaldo
+        
+        # Calculate total current balance
+        total_aktuelt_saldo = total_startsaldo_all + total_indtaegter_all - total_udgifter_all
         
         return DashboardStats(
+            aktuelt_saldo=total_aktuelt_saldo,
             total_indtaegter=total_indtaegter_all,
             total_udgifter=total_udgifter_all,
             afdelinger_saldi=afdelinger_saldi
