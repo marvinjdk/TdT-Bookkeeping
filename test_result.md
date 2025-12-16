@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the new Admin dashboard features for the Tour de Taxa bookkeeping app - specifically the total combined balance summary card and the table showing ALL afdelinger with their current balances"
+user_problem_statement: "Test Admin transactions page - clicking on a department from dashboard should show transactions. Admin should be able to see which department each transaction belongs to, filter by department, and view all transactions."
 
 frontend:
   - task: "Admin Dashboard Total Balance Summary Card"
@@ -240,7 +240,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All admin dashboard features verified on both Dashboard and Admin pages"
+    - "Admin Transactions Page - Department filtering and navigation"
+    - "Admin Transactions Page - Show department name column"
+    - "Browser title verification"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -256,3 +258,5 @@ agent_communication:
       message: "✅ TESTING COMPLETED SUCCESSFULLY: All new Admin dashboard features working perfectly! Verified: 1) Total balance summary card shows correct combined balance (7700.00 kr.) with breakdown of total income (1000.00 kr.) and expenses (300.00 kr.) 2) 'Alle Hold - Saldi' table displays all 7 departments including those without users, with correct balances 3) Himmerland shows 7700.00 kr. as expected 4) All other departments show 0.00 kr. 5) User overview section still works correctly with 4 users displayed. No critical issues found - all functionality working as specified in requirements."
     - agent: "testing"
       message: "✅ COMPREHENSIVE TESTING COMPLETED: Verified Admin dashboard features work correctly on BOTH Dashboard and Admin pages for admin users. DASHBOARD PAGE: Successfully shows 'Samlet nuværende saldo for alle hold' card with 7700.00 kr. and 'Hold Oversigt' section with all 7 departments. ADMIN PAGE: Successfully shows same total balance card and 'Alle Hold - Saldi' table with all 7 departments. All departments display correct balances (Himmerland: 7700.00 kr., others: 0.00 kr.). Screenshots captured for both pages. No critical issues found - all functionality working as specified."
+    - agent: "main"
+      message: "NEW FIXES IMPLEMENTED: 1) Admin transactions page - clicking on department from dashboard now navigates correctly using afdeling_navn parameter 2) Added department dropdown filter for admin to switch between departments or view all 3) Added 'Hold' column to show which department each transaction belongs to when viewing all 4) Browser title confirmed working as 'Tour de Taxa - Hold bogføring'. Please test: a) Click on Himmerland from dashboard -> should show its transactions b) Click Posteringer in menu -> should show all transactions with Hold column c) Use dropdown to filter by department d) Verify browser title"
