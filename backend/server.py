@@ -549,6 +549,32 @@ async def upload_receipt(
     kvittering_url = f"/uploads/kvitteringer/{afdeling_navn}/{regnskabsaar}/{safe_filename}"
     await db.transactions.update_one(
         {"id": transaction_id},
+
+@api_router.get("/uploads/kvitteringer/{afdeling_navn}/{regnskabsaar}/{filename}")
+async def download_receipt(
+    afdeling_navn: str,
+    regnskabsaar: str,
+    filename: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Download a receipt file"""
+    file_path = Path(f"/app/uploads/kvitteringer/{afdeling_navn}/{regnskabsaar}/{filename}")
+    
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Fil ikke fundet")
+    
+    # Check permissions
+    if current_user.role == "afdeling":
+        if current_user.afdeling_navn != afdeling_navn:
+            raise HTTPException(status_code=403, detail="Ingen adgang")
+    
+    from fastapi.responses import FileResponse
+    return FileResponse(
+        path=file_path,
+        filename=filename,
+        media_type="application/octet-stream"
+    )
+
         {"$set": {"kvittering_url": kvittering_url}}
     )
     
