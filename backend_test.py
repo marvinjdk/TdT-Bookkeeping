@@ -477,6 +477,9 @@ def main():
     else:
         tester.test_get_me()
         tester.test_dashboard_stats()
+        tester.test_admin_dashboard_stats_with_afdelinger_saldi()
+        tester.test_admin_transactions_by_afdeling_id()
+        tester.test_admin_transactions_all_departments()
         tester.test_admin_list_users()
         tester.test_admin_create_user()
         tester.test_excel_export()
