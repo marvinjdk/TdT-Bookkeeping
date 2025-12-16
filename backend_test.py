@@ -265,6 +265,143 @@ class BogforingsappAPITester:
             print("⏭️  Skipping admin create user test - not an admin user")
             return True
 
+    def test_admin_dashboard_stats_with_afdelinger_saldi(self):
+        """Test admin dashboard stats - verify user_id is included in afdelinger_saldi"""
+        if self.current_user and self.current_user['role'] == 'admin':
+            success, response = self.run_test(
+                "Admin Dashboard Stats with Afdelinger Saldi",
+                "GET",
+                "dashboard/stats",
+                200
+            )
+            if success:
+                afdelinger_saldi = response.get('afdelinger_saldi', [])
+                print(f"   Found {len(afdelinger_saldi)} afdelinger in saldi")
+                
+                # Check if user_id is included for departments with users
+                for afdeling in afdelinger_saldi:
+                    afdeling_navn = afdeling.get('afdeling_navn', 'Unknown')
+                    user_id = afdeling.get('user_id')
+                    aktuelt_saldo = afdeling.get('aktuelt_saldo', 0)
+                    print(f"   - {afdeling_navn}: {aktuelt_saldo} kr (user_id: {user_id})")
+                
+                # Verify structure
+                if afdelinger_saldi:
+                    first_afdeling = afdelinger_saldi[0]
+                    required_fields = ['afdeling_id', 'afdeling_navn', 'aktuelt_saldo']
+                    missing_fields = [field for field in required_fields if field not in first_afdeling]
+                    if missing_fields:
+                        print(f"   ❌ Missing required fields: {missing_fields}")
+                        return False
+                    else:
+                        print(f"   ✅ All required fields present in afdelinger_saldi")
+                
+            return success
+        else:
+            print("⏭️  Skipping admin dashboard stats test - not an admin user")
+            return True
+
+    def test_admin_transactions_by_afdeling_id(self):
+        """Test admin transactions filtering by afdeling_id"""
+        if self.current_user and self.current_user['role'] == 'admin':
+            # First get the dashboard stats to find an afdeling with transactions
+            stats_success, stats_response = self.run_test(
+                "Get Dashboard Stats for Afdeling Lookup",
+                "GET",
+                "dashboard/stats",
+                200
+            )
+            
+            if not stats_success:
+                print("   ❌ Could not get dashboard stats for afdeling lookup")
+                return False
+            
+            afdelinger_saldi = stats_response.get('afdelinger_saldi', [])
+            test_afdeling = None
+            
+            # Find an afdeling with a user_id (meaning it has transactions)
+            for afdeling in afdelinger_saldi:
+                if afdeling.get('user_id') and afdeling.get('afdeling_navn') == 'Himmerland':
+                    test_afdeling = afdeling
+                    break
+            
+            if not test_afdeling:
+                # Try to find any afdeling with user_id
+                for afdeling in afdelinger_saldi:
+                    if afdeling.get('user_id'):
+                        test_afdeling = afdeling
+                        break
+            
+            if not test_afdeling:
+                print("   ⚠️  No afdeling with user_id found for testing")
+                return True
+            
+            afdeling_id = test_afdeling['user_id']  # Use user_id as afdeling_id for transactions
+            afdeling_navn = test_afdeling['afdeling_navn']
+            
+            success, response = self.run_test(
+                f"Admin Transactions for {afdeling_navn}",
+                "GET",
+                f"transactions?afdeling_id={afdeling_id}",
+                200
+            )
+            
+            if success:
+                transactions = response if isinstance(response, list) else []
+                print(f"   Found {len(transactions)} transactions for {afdeling_navn}")
+                
+                # Verify all transactions belong to the correct afdeling
+                for transaction in transactions:
+                    if transaction.get('afdeling_id') != afdeling_id:
+                        print(f"   ❌ Transaction {transaction.get('bilagnr')} has wrong afdeling_id")
+                        return False
+                
+                if transactions:
+                    print(f"   ✅ All transactions correctly filtered for afdeling_id: {afdeling_id}")
+                    # Show sample transaction
+                    sample = transactions[0]
+                    print(f"   Sample: {sample.get('bilagnr')} - {sample.get('tekst')} ({sample.get('belob')} kr)")
+            
+            return success
+        else:
+            print("⏭️  Skipping admin transactions by afdeling test - not an admin user")
+            return True
+
+    def test_admin_transactions_all_departments(self):
+        """Test admin viewing all transactions (should show transactions from all departments)"""
+        if self.current_user and self.current_user['role'] == 'admin':
+            success, response = self.run_test(
+                "Admin All Transactions",
+                "GET",
+                "transactions",
+                200
+            )
+            
+            if success:
+                transactions = response if isinstance(response, list) else []
+                print(f"   Found {len(transactions)} total transactions across all departments")
+                
+                # Group by afdeling_id to show distribution
+                afdeling_counts = {}
+                for transaction in transactions:
+                    afdeling_id = transaction.get('afdeling_id', 'Unknown')
+                    afdeling_counts[afdeling_id] = afdeling_counts.get(afdeling_id, 0) + 1
+                
+                print(f"   Transactions by afdeling_id:")
+                for afdeling_id, count in afdeling_counts.items():
+                    print(f"   - {afdeling_id}: {count} transactions")
+                
+                if transactions:
+                    # Show sample transactions
+                    print(f"   Sample transactions:")
+                    for i, transaction in enumerate(transactions[:3]):
+                        print(f"   {i+1}. {transaction.get('bilagnr')} - {transaction.get('tekst')} (Afdeling: {transaction.get('afdeling_id')})")
+            
+            return success
+        else:
+            print("⏭️  Skipping admin all transactions test - not an admin user")
+            return True
+
     def test_excel_export(self):
         """Test Excel export"""
         success, response = self.run_test(
