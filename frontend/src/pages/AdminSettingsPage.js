@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Edit, Save } from 'lucide-react';
 import { toast } from 'sonner';
+import { formatCurrencyWithUnit } from '@/utils/formatNumber';
 
 export default function AdminSettingsPage() {
   const [afdelingerSettings, setAfdelingerSettings] = useState([]);
