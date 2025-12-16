@@ -115,6 +115,7 @@ class AfdelingSaldo(BaseModel):
     afdeling_id: str
     afdeling_navn: str
     aktuelt_saldo: float
+    user_id: Optional[str] = None  # The user ID used for transactions
 
 class DashboardStats(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -671,7 +672,8 @@ async def get_dashboard_stats(
             afdelinger_saldi.append(AfdelingSaldo(
                 afdeling_id=afdeling["id"],
                 afdeling_navn=afdeling["navn"],
-                aktuelt_saldo=aktuelt_saldo
+                aktuelt_saldo=aktuelt_saldo,
+                user_id=afdeling_id_for_query if user_with_afdeling else None
             ))
             
             total_indtaegter_all += indtaegter
