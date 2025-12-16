@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '@/App';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Edit, Trash2, Search, FileImage } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, FileImage, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatCurrencyWithUnit } from '@/utils/formatNumber';
 
@@ -31,38 +31,87 @@ export default function TransactionsPage({ user }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [formalFilter, setFormalFilter] = useState('all');
-  const [viewingAfdelingName, setViewingAfdelingName] = useState('');
+  const [afdelinger, setAfdelinger] = useState([]);
+  const [afdelingerMap, setAfdelingerMap] = useState({});
+  const [selectedAfdelingFilter, setSelectedAfdelingFilter] = useState('all');
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
   const isAdmin = user.role === 'admin' || user.role === 'superbruger';
   
-  // Get afdeling_id from URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const viewingAfdelingId = urlParams.get('afdeling_id');
+  // Get afdeling_id or afdeling_navn from URL
+  const urlAfdelingId = searchParams.get('afdeling_id');
+  const urlAfdelingNavn = searchParams.get('afdeling_navn');
 
   useEffect(() => {
-    fetchTransactions();
-  }, [viewingAfdelingId]); // Re-fetch when afdeling_id changes
+    if (isAdmin) {
+      fetchAfdelinger();
+    } else {
+      fetchTransactions();
+    }
+  }, [isAdmin]);
+
+  useEffect(() => {
+    if (isAdmin && afdelinger.length > 0) {
+      fetchTransactions();
+    }
+  }, [afdelinger, urlAfdelingId, urlAfdelingNavn, selectedAfdelingFilter]);
 
   useEffect(() => {
     applyFilters();
   }, [transactions, searchTerm, typeFilter, formalFilter]);
 
+  const fetchAfdelinger = async () => {
+    try {
+      // Get afdelinger from dashboard stats (includes user_id)
+      const statsRes = await api.get('/dashboard/stats');
+      if (statsRes.data.afdelinger_saldi) {
+        const afdelingerData = statsRes.data.afdelinger_saldi;
+        setAfdelinger(afdelingerData);
+        
+        // Create mapping for afdeling_id (user_id) to afdeling_navn
+        const mapping = {};
+        afdelingerData.forEach(afd => {
+          if (afd.user_id) {
+            mapping[afd.user_id] = afd.afdeling_navn;
+          }
+        });
+        setAfdelingerMap(mapping);
+        
+        // Set selected filter from URL if provided
+        if (urlAfdelingNavn) {
+          setSelectedAfdelingFilter(urlAfdelingNavn);
+        } else if (urlAfdelingId) {
+          // Find afdeling by ID and use its user_id
+          const afd = afdelingerData.find(a => a.afdeling_id === urlAfdelingId);
+          if (afd && afd.user_id) {
+            setSelectedAfdelingFilter(afd.afdeling_navn);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Kunne ikke hente afdelinger', error);
+    }
+  };
+
   const fetchTransactions = async () => {
     setLoading(true);
     try {
       let url = '/transactions';
+      const params = new URLSearchParams();
       
-      if (viewingAfdelingId && isAdmin) {
-        url += `?afdeling_id=${viewingAfdelingId}`;
-        
-        // Get afdeling name
-        const usersRes = await api.get('/admin/users');
-        const afdeling = usersRes.data.find(u => u.id === viewingAfdelingId);
-        if (afdeling) {
-          setViewingAfdelingName(afdeling.afdeling_navn);
+      if (isAdmin) {
+        // Find the user_id for the selected afdeling
+        if (selectedAfdelingFilter && selectedAfdelingFilter !== 'all') {
+          const selectedAfd = afdelinger.find(a => a.afdeling_navn === selectedAfdelingFilter);
+          if (selectedAfd && selectedAfd.user_id) {
+            params.append('afdeling_id', selectedAfd.user_id);
+          }
         }
-      } else {
-        setViewingAfdelingName('');
+      }
+      
+      if (params.toString()) {
+        url += `?${params.toString()}`;
       }
       
       const res = await api.get(url);
@@ -108,7 +157,24 @@ export default function TransactionsPage({ user }) {
     }
   };
 
-  if (loading) {
+  const handleAfdelingFilterChange = (value) => {
+    setSelectedAfdelingFilter(value);
+    // Update URL
+    if (value === 'all') {
+      searchParams.delete('afdeling_id');
+      searchParams.delete('afdeling_navn');
+    } else {
+      searchParams.set('afdeling_navn', value);
+      searchParams.delete('afdeling_id');
+    }
+    setSearchParams(searchParams);
+  };
+
+  const getAfdelingNavn = (afdelingId) => {
+    return afdelingerMap[afdelingId] || 'Ukendt';
+  };
+
+  if (loading && !isAdmin) {
     return <div className="p-8">Indlæser...</div>;
   }
 
@@ -118,7 +184,10 @@ export default function TransactionsPage({ user }) {
         <div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">Posteringer</h1>
           <p className="text-base md:text-lg text-slate-600 mt-2">
-            {viewingAfdelingName ? `Posteringer for ${viewingAfdelingName}` : 'Administrer dine bogføringsposteringer'}
+            {isAdmin 
+              ? (selectedAfdelingFilter !== 'all' ? `Posteringer for ${selectedAfdelingFilter}` : 'Alle posteringer')
+              : 'Administrer dine bogføringsposteringer'
+            }
           </p>
         </div>
         {!isAdmin && (
@@ -138,7 +207,25 @@ export default function TransactionsPage({ user }) {
           <CardTitle className="text-xl font-semibold">Filtre</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className={`grid grid-cols-1 ${isAdmin ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4`}>
+            {/* Admin: Afdeling filter */}
+            {isAdmin && (
+              <Select value={selectedAfdelingFilter} onValueChange={handleAfdelingFilterChange}>
+                <SelectTrigger data-testid="afdeling-filter" className="bg-white border-slate-200 focus:ring-2 focus:ring-[#109848]/20">
+                  <Users size={18} className="mr-2 text-slate-400" />
+                  <SelectValue placeholder="Vælg hold" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle hold</SelectItem>
+                  {afdelinger.map((afd) => (
+                    <SelectItem key={afd.afdeling_id} value={afd.afdeling_navn}>
+                      {afd.afdeling_navn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <Input
@@ -150,24 +237,24 @@ export default function TransactionsPage({ user }) {
               />
             </div>
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger data-testid="type-filter">
+              <SelectTrigger data-testid="type-filter" className="bg-white border-slate-200 focus:ring-2 focus:ring-[#109848]/20">
                 <SelectValue placeholder="Type" />
               </SelectTrigger>
-              <SelectContent position="popper">
+              <SelectContent>
                 <SelectItem value="all">Alle typer</SelectItem>
                 <SelectItem value="indtaegt">Indtægt</SelectItem>
                 <SelectItem value="udgift">Udgift</SelectItem>
               </SelectContent>
             </Select>
             <Select value={formalFilter} onValueChange={setFormalFilter}>
-              <SelectTrigger data-testid="formal-filter">
+              <SelectTrigger data-testid="formal-filter" className="bg-white border-slate-200 focus:ring-2 focus:ring-[#109848]/20">
                 <SelectValue placeholder="Formål" />
               </SelectTrigger>
-              <SelectContent position="popper" className="max-h-[300px] overflow-y-auto">
+              <SelectContent>
                 <SelectItem value="all">Alle formål</SelectItem>
-                {FORMAL_OPTIONS.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
+                {FORMAL_OPTIONS.map((formal) => (
+                  <SelectItem key={formal} value={formal}>
+                    {formal}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -177,59 +264,88 @@ export default function TransactionsPage({ user }) {
       </Card>
 
       <Card className="bg-white border border-slate-100 shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold">
+            Posteringsoversigt
+            <span className="ml-2 text-base font-normal text-slate-500">
+              ({filteredTransactions.length} {filteredTransactions.length === 1 ? 'postering' : 'posteringer'})
+            </span>
+          </CardTitle>
+        </CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-slate-50 border-b border-slate-200">
-                  <TableHead className="font-semibold text-slate-700">Bilagnr.</TableHead>
-                  <TableHead className="font-semibold text-slate-700">Bank dato</TableHead>
-                  <TableHead className="font-semibold text-slate-700">Tekst</TableHead>
-                  <TableHead className="font-semibold text-slate-700">Formål</TableHead>
-                  <TableHead className="font-semibold text-slate-700">Beløb</TableHead>
-                  <TableHead className="font-semibold text-slate-700">Type</TableHead>
-                  <TableHead className="font-semibold text-slate-700">Kvittering</TableHead>
-                  <TableHead className="font-semibold text-slate-700 text-right">Handlinger</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredTransactions.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-12 text-slate-500">
-                      Ingen posteringer fundet
-                    </TableCell>
+          {loading ? (
+            <div className="p-8 text-center text-slate-500">Indlæser posteringer...</div>
+          ) : filteredTransactions.length === 0 ? (
+            <div className="p-8 text-center text-slate-500">
+              {isAdmin && selectedAfdelingFilter === 'all' 
+                ? 'Vælg et hold for at se posteringer, eller skift til "Alle hold" for at se alle'
+                : 'Ingen posteringer fundet'
+              }
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50 border-b border-slate-200">
+                    {isAdmin && selectedAfdelingFilter === 'all' && (
+                      <TableHead className="font-semibold text-slate-700">Hold</TableHead>
+                    )}
+                    <TableHead className="font-semibold text-slate-700">Bilagnr.</TableHead>
+                    <TableHead className="font-semibold text-slate-700">Bank dato</TableHead>
+                    <TableHead className="font-semibold text-slate-700">Tekst</TableHead>
+                    <TableHead className="font-semibold text-slate-700">Formål</TableHead>
+                    <TableHead className="font-semibold text-slate-700 text-right">Beløb</TableHead>
+                    <TableHead className="font-semibold text-slate-700 text-center">Type</TableHead>
+                    <TableHead className="font-semibold text-slate-700 text-center">Kvit.</TableHead>
+                    {!isAdmin && (
+                      <TableHead className="font-semibold text-slate-700 text-right">Handlinger</TableHead>
+                    )}
                   </TableRow>
-                ) : (
-                  filteredTransactions.map((transaction) => (
+                </TableHeader>
+                <TableBody>
+                  {filteredTransactions.map((transaction) => (
                     <TableRow
                       key={transaction.id}
-                      data-testid={`transaction-row-${transaction.id}`}
                       className="hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-0"
+                      data-testid={`transaction-row-${transaction.id}`}
                     >
-                      <TableCell>{transaction.bilagnr}</TableCell>
-                      <TableCell>{transaction.bank_dato}</TableCell>
-                      <TableCell>{transaction.tekst}</TableCell>
-                      <TableCell>{transaction.formal}</TableCell>
-                      <TableCell className="font-medium">{formatCurrencyWithUnit(transaction.belob)}</TableCell>
-                      <TableCell>
+                      {isAdmin && selectedAfdelingFilter === 'all' && (
+                        <TableCell className="font-medium text-slate-600">
+                          <span className="px-2 py-1 rounded bg-slate-100 text-xs">
+                            {getAfdelingNavn(transaction.afdeling_id)}
+                          </span>
+                        </TableCell>
+                      )}
+                      <TableCell className="font-mono text-slate-800">{transaction.bilagnr}</TableCell>
+                      <TableCell className="text-slate-600">{transaction.bank_dato}</TableCell>
+                      <TableCell className="max-w-[200px] truncate text-slate-700" title={transaction.tekst}>
+                        {transaction.tekst}
+                      </TableCell>
+                      <TableCell className="text-slate-600">{transaction.formal}</TableCell>
+                      <TableCell className="text-right font-medium">
+                        <span className={transaction.type === 'indtaegt' ? 'text-[#109848]' : 'text-red-600'}>
+                          {transaction.type === 'indtaegt' ? '+' : '-'}{formatCurrencyWithUnit(transaction.belob)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-center">
                         <span
                           className={`px-2 py-1 rounded text-xs font-medium ${
                             transaction.type === 'indtaegt'
-                              ? 'bg-blue-50 text-blue-700'
-                              : 'bg-orange-50 text-orange-700'
+                              ? 'bg-[#109848]/10 text-[#109848]'
+                              : 'bg-red-50 text-red-600'
                           }`}
                         >
                           {transaction.type === 'indtaegt' ? 'Indtægt' : 'Udgift'}
                         </span>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         {transaction.kvittering_url ? (
                           <a
-                            href={`${api.defaults.baseURL}${transaction.kvittering_url}`}
+                            href={`${process.env.REACT_APP_BACKEND_URL}${transaction.kvittering_url}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center text-[#109848] hover:text-[#0d7a39] transition-colors"
-                            title="Se kvittering"
+                            className="inline-flex items-center justify-center p-1 rounded hover:bg-blue-50 text-blue-600"
+                            title="Download kvittering"
                           >
                             <FileImage size={18} />
                           </a>
@@ -237,15 +353,15 @@ export default function TransactionsPage({ user }) {
                           <span className="text-slate-300">-</span>
                         )}
                       </TableCell>
-                      <TableCell className="text-right">
-                        {!isAdmin ? (
-                          <div className="flex items-center justify-end gap-2">
+                      {!isAdmin && (
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => navigate(`/transactions/${transaction.id}/edit`)}
-                              data-testid={`edit-transaction-${transaction.id}`}
-                              className="hover:bg-slate-100"
+                              data-testid={`edit-button-${transaction.id}`}
+                              className="hover:bg-blue-50 hover:text-blue-600"
                             >
                               <Edit size={16} />
                             </Button>
@@ -253,22 +369,20 @@ export default function TransactionsPage({ user }) {
                               size="sm"
                               variant="ghost"
                               onClick={() => handleDelete(transaction.id)}
-                              data-testid={`delete-transaction-${transaction.id}`}
+                              data-testid={`delete-button-${transaction.id}`}
                               className="hover:bg-red-50 hover:text-red-600"
                             >
                               <Trash2 size={16} />
                             </Button>
                           </div>
-                        ) : (
-                          <span className="text-sm text-slate-500">Kun læsning</span>
-                        )}
-                      </TableCell>
+                        </TableCell>
+                      )}
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
