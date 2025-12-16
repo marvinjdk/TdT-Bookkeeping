@@ -519,25 +519,40 @@ async def upload_receipt(
     if current_user.role == "afdeling" and transaction["afdeling_id"] != current_user.id:
         raise HTTPException(status_code=403, detail="Ingen adgang")
     
-    # Save file locally (later can be Dropbox)
-    upload_dir = Path("/app/uploads")
-    upload_dir.mkdir(exist_ok=True)
+    # Get afdeling info
+    if current_user.role == "afdeling":
+        afdeling_navn = current_user.afdeling_navn
+    else:
+        # For admin/superbruger, get afdeling from transaction
+        user_doc = await db.users.find_one({"id": transaction["afdeling_id"]}, {"_id": 0})
+        afdeling_navn = user_doc.get("afdeling_navn", "Ukendt") if user_doc else "Ukendt"
     
+    # Get regnskabsaar from transaction
+    regnskabsaar = transaction.get("regnskabsaar", "2024-2025")
+    
+    # Create folder structure: /app/uploads/kvitteringer/[Afdeling]/[År]/
+    base_dir = Path("/app/uploads/kvitteringer")
+    upload_dir = base_dir / afdeling_navn / regnskabsaar
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Generate safe filename
     file_extension = Path(file.filename).suffix
-    filename = f"{transaction_id}_{uuid.uuid4()}{file_extension}"
-    file_path = upload_dir / filename
+    safe_filename = f"{transaction['bilagnr']}_{uuid.uuid4().hex[:8]}{file_extension}"
+    file_path = upload_dir / safe_filename
     
+    # Save file
     with open(file_path, "wb") as f:
         content = await file.read()
         f.write(content)
     
-    kvittering_url = f"/uploads/{filename}"
+    # Store relative path
+    kvittering_url = f"/uploads/kvitteringer/{afdeling_navn}/{regnskabsaar}/{safe_filename}"
     await db.transactions.update_one(
         {"id": transaction_id},
         {"$set": {"kvittering_url": kvittering_url}}
     )
     
-    return {"success": True, "url": kvittering_url}
+    return {"success": True, "url": kvittering_url, "filename": safe_filename}
 
 # Dashboard stats
 @api_router.get("/dashboard/stats", response_model=DashboardStats)
