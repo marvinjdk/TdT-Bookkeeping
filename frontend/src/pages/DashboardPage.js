@@ -428,7 +428,7 @@ export default function DashboardPage({ user }) {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className={`text-2xl font-bold font-data ${stat.color}`}>{stat.value}</div>
+                <div className={`text-2xl font-bold ${stat.color}`}>{stat.value}</div>
               </CardContent>
             </Card>
           );
