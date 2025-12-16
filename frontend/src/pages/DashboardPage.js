@@ -450,8 +450,8 @@ export default function DashboardPage({ user }) {
                   data-testid={`view-hold-${afd.afdeling_id}`}
                 >
                   <span className="font-medium text-slate-700">{afd.afdeling_navn}</span>
-                  <span className={`font-bold font-data text-lg ${afd.aktuelt_saldo >= 0 ? 'text-[#109848]' : 'text-red-600'}`}>
-                    {afd.aktuelt_saldo.toFixed(2)} kr.
+                  <span className={`font-bold text-lg ${afd.aktuelt_saldo >= 0 ? 'text-[#109848]' : 'text-red-600'}`}>
+                    {formatCurrencyWithUnit(afd.aktuelt_saldo)}
                   </span>
                 </button>
               ))}
