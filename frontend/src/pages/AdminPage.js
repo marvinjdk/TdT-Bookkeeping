@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Plus, Trash2, Eye, Settings, Key, Edit2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { formatCurrencyWithUnit, formatCurrency } from '@/utils/formatNumber';
 
 export default function AdminPage({ user }) {
   const [users, setUsers] = useState([]);
