@@ -883,7 +883,7 @@ async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn, regnskabsaar=Non
     # Style headers
     header_fill = PatternFill(start_color="109848", end_color="109848", fill_type="solid")
     header_font = Font(bold=True, color="FFFFFF")
-    header_row = ws[3]
+    header_row = ws[4]  # Changed from 3 to 4 due to kvitteringer row
     for cell in header_row:
         cell.fill = header_fill
         cell.font = header_font
