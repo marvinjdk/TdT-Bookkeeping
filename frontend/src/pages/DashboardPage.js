@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { TrendingUp, TrendingDown, FileText, Wallet, Users as UsersIcon, Plus, Key } from 'lucide-react';
 import { toast } from 'sonner';
+import { formatCurrencyWithUnit, formatCurrency } from '@/utils/formatNumber';
 
 export default function DashboardPage({ user }) {
   const [stats, setStats] = useState(null);
