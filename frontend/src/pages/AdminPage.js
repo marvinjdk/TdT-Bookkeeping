@@ -422,9 +422,9 @@ export default function AdminPage({ user }) {
                       </span>
                     </TableCell>
                     <TableCell>{user.afdeling_navn || '-'}</TableCell>
-                    <TableCell className="font-data">
+                    <TableCell>
                       {user.role === 'afdeling' && stats[user.id]
-                        ? `${stats[user.id].aktuelt_saldo.toFixed(2)} kr.`
+                        ? formatCurrencyWithUnit(stats[user.id].aktuelt_saldo)
                         : '-'}
                     </TableCell>
                     <TableCell>
