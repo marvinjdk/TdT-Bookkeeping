@@ -99,7 +99,7 @@ export default function AdminSettingsPage() {
                   >
                     <TableCell className="font-medium">{afd.afdeling_navn}</TableCell>
                     <TableCell>{afd.settings.regnskabsaar}</TableCell>
-                    <TableCell className="font-data">{afd.settings.startsaldo.toFixed(2)} kr.</TableCell>
+                    <TableCell>{formatCurrencyWithUnit(afd.settings.startsaldo)}</TableCell>
                     <TableCell>{afd.settings.periode_start}</TableCell>
                     <TableCell>{afd.settings.periode_slut}</TableCell>
                     <TableCell className="text-right">
