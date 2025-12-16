@@ -328,20 +328,20 @@ export default function AdminPage({ user }) {
               <div>
                 <p className="text-sm font-medium text-green-700 mb-1">Samlet nuværende saldo for alle hold</p>
                 <p className="text-3xl md:text-4xl font-bold text-green-900">
-                  {allAfdelingerStats.aktuelt_saldo.toFixed(2)} kr.
+                  {formatCurrencyWithUnit(allAfdelingerStats.aktuelt_saldo)}
                 </p>
               </div>
               <div className="flex gap-6 text-sm">
                 <div className="text-center">
                   <p className="text-slate-600 font-medium mb-1">Total Indtægter</p>
                   <p className="text-lg font-semibold text-green-700">
-                    {allAfdelingerStats.total_indtaegter.toFixed(2)} kr.
+                    {formatCurrencyWithUnit(allAfdelingerStats.total_indtaegter)}
                   </p>
                 </div>
                 <div className="text-center">
                   <p className="text-slate-600 font-medium mb-1">Total Udgifter</p>
                   <p className="text-lg font-semibold text-red-600">
-                    {allAfdelingerStats.total_udgifter.toFixed(2)} kr.
+                    {formatCurrencyWithUnit(allAfdelingerStats.total_udgifter)}
                   </p>
                 </div>
               </div>
