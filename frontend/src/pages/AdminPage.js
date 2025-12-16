@@ -436,9 +436,10 @@ export default function AdminPage({ user }) {
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => navigate(`/?afdeling_id=${user.id}`)}
+                            onClick={() => navigate(`/transactions?afdeling_navn=${encodeURIComponent(user.afdeling_navn)}`)}
                             data-testid={`view-afdeling-${user.id}`}
                             className="hover:bg-slate-100"
+                            title="Se posteringer"
                           >
                             <Eye size={16} />
                           </Button>
