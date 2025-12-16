@@ -81,6 +81,22 @@ class BogforingsappAPITester:
             return True
         return False
 
+    def test_login_superuser(self):
+        """Test login with superuser"""
+        success, response = self.run_test(
+            "Login - Superuser",
+            "POST",
+            "auth/login",
+            200,
+            data={"username": "superbruger", "password": "super123"}
+        )
+        if success and 'access_token' in response:
+            self.token = response['access_token']
+            self.current_user = response['user']
+            print(f"   Logged in as: {self.current_user['username']} ({self.current_user['role']})")
+            return True
+        return False
+
     def test_login_admin(self):
         """Test login with admin user"""
         success, response = self.run_test(
