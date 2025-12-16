@@ -574,6 +574,10 @@ async def download_receipt(
     
     from fastapi.responses import FileResponse
     return FileResponse(
+        path=file_path,
+        filename=filename,
+        media_type="application/octet-stream"
+    )
 
 @api_router.get("/kvitteringer/folder")
 async def get_kvitteringer_folder_info(
@@ -603,16 +607,6 @@ async def get_kvitteringer_folder_info(
         "files": files,
         "count": len(files)
     }
-
-        path=file_path,
-        filename=filename,
-        media_type="application/octet-stream"
-    )
-
-        {"$set": {"kvittering_url": kvittering_url}}
-    )
-    
-    return {"success": True, "url": kvittering_url, "filename": safe_filename}
 
 # Dashboard stats
 @api_router.get("/dashboard/stats", response_model=DashboardStats)
