@@ -223,8 +223,18 @@ export default function TransactionsPage({ user }) {
                         </span>
                       </TableCell>
                       <TableCell>
-                        {transaction.kvittering_url && (
-                          <FileImage size={18} className="text-[#109848]" />
+                        {transaction.kvittering_url ? (
+                          <a
+                            href={`${api.defaults.baseURL}${transaction.kvittering_url}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center text-[#109848] hover:text-[#0d7a39] transition-colors"
+                            title="Se kvittering"
+                          >
+                            <FileImage size={18} />
+                          </a>
+                        ) : (
+                          <span className="text-slate-300">-</span>
                         )}
                       </TableCell>
                       <TableCell className="text-right">
