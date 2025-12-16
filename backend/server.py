@@ -866,6 +866,13 @@ async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn, regnskabsaar=Non
     ws[1][0].font = Font(bold=True)
     ws[1][4].font = Font(bold=True)
     
+    # Add kvitteringer folder info
+    kvit_regnskabsaar = regnskabsaar if regnskabsaar else (settings.get("regnskabsaar", "2024-2025") if settings else "2024-2025")
+    kvit_folder_path = f"/app/uploads/kvitteringer/{afdeling_navn}/{kvit_regnskabsaar}"
+    ws.append(["Kvitteringer mappe:", kvit_folder_path, "", "", "", ""])
+    ws[2][0].font = Font(bold=True, color="0066CC")
+    ws[2][1].font = Font(color="0066CC")
+    
     # Add empty row
     ws.append([])
     
