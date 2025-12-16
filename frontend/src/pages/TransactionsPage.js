@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Edit, Trash2, Search, FileImage } from 'lucide-react';
 import { toast } from 'sonner';
+import { formatCurrencyWithUnit } from '@/utils/formatNumber';
 
 const FORMAL_OPTIONS = [
   'Ryttermøder',
