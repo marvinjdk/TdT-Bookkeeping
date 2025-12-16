@@ -189,6 +189,54 @@ frontend:
           agent: "testing"
           comment: "CONFIRMED: Department list display working correctly. Departments visible in both user overview table and department management dialog."
 
+  - task: "Admin Transactions Page - Department Navigation"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/TransactionsPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "NEW: Clicking on a department from dashboard should navigate to transactions page and show only that department's transactions. Uses afdeling_navn URL parameter instead of afdeling_id."
+
+  - task: "Admin Transactions Page - Department Column"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/TransactionsPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "NEW: When admin views 'Alle hold', a 'Hold' column should be visible showing which department each transaction belongs to."
+
+  - task: "Admin Transactions Page - Department Filter Dropdown"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/TransactionsPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "NEW: Admin should be able to filter transactions by department using a dropdown. Options include 'Alle hold' and each individual department."
+
+  - task: "Browser Title"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/public/index.html"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Browser title should show 'Tour de Taxa - Hold bogføring'. Verified in code and playwright test shows correct title."
+
   - task: "Department CRUD Operations"
     implemented: true
     working: true
