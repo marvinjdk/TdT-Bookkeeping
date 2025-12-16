@@ -372,9 +372,9 @@ export default function AdminPage({ user }) {
                       className="hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-0"
                     >
                       <TableCell className="font-medium">{afdeling.afdeling_navn}</TableCell>
-                      <TableCell className="text-right font-data">
+                      <TableCell className="text-right">
                         <span className={afdeling.aktuelt_saldo >= 0 ? 'text-green-700' : 'text-red-600'}>
-                          {afdeling.aktuelt_saldo.toFixed(2)} kr.
+                          {formatCurrencyWithUnit(afdeling.aktuelt_saldo)}
                         </span>
                       </TableCell>
                     </TableRow>
