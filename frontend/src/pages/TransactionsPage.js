@@ -206,11 +206,11 @@ export default function TransactionsPage({ user }) {
                       data-testid={`transaction-row-${transaction.id}`}
                       className="hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-0"
                     >
-                      <TableCell className="font-data">{transaction.bilagnr}</TableCell>
-                      <TableCell className="font-data">{transaction.bank_dato}</TableCell>
+                      <TableCell>{transaction.bilagnr}</TableCell>
+                      <TableCell>{transaction.bank_dato}</TableCell>
                       <TableCell>{transaction.tekst}</TableCell>
                       <TableCell>{transaction.formal}</TableCell>
-                      <TableCell className="font-data font-medium">{transaction.belob.toFixed(2)} kr.</TableCell>
+                      <TableCell className="font-medium">{formatCurrencyWithUnit(transaction.belob)}</TableCell>
                       <TableCell>
                         <span
                           className={`px-2 py-1 rounded text-xs font-medium ${
