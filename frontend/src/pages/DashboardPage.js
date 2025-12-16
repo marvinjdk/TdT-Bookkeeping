@@ -445,7 +445,7 @@ export default function DashboardPage({ user }) {
               {stats.afdelinger_saldi.map((afd) => (
                 <button
                   key={afd.afdeling_id}
-                  onClick={() => navigate(`/transactions?afdeling_id=${afd.afdeling_id}`)}
+                  onClick={() => navigate(`/transactions?afdeling_navn=${encodeURIComponent(afd.afdeling_navn)}`)}
                   className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
                   data-testid={`view-hold-${afd.afdeling_id}`}
                 >
