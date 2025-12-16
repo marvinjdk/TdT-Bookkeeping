@@ -326,7 +326,7 @@ export default function DashboardPage({ user }) {
   const statCards = isAdmin ? [
     {
       title: 'Total Indtægter (Alle hold)',
-      value: `${stats.total_indtaegter.toFixed(2)} kr.`,
+      value: formatCurrencyWithUnit(stats.total_indtaegter),
       icon: TrendingUp,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
@@ -334,7 +334,7 @@ export default function DashboardPage({ user }) {
     },
     {
       title: 'Total Udgifter (Alle hold)',
-      value: `${stats.total_udgifter.toFixed(2)} kr.`,
+      value: formatCurrencyWithUnit(stats.total_udgifter),
       icon: TrendingDown,
       color: 'text-orange-600',
       bgColor: 'bg-orange-50',
@@ -343,7 +343,7 @@ export default function DashboardPage({ user }) {
   ] : [
     {
       title: 'Aktuel Saldo',
-      value: `${stats.aktuelt_saldo.toFixed(2)} kr.`,
+      value: formatCurrencyWithUnit(stats.aktuelt_saldo),
       icon: Wallet,
       color: 'text-[#109848]',
       bgColor: 'bg-[#109848]/10',
@@ -351,7 +351,7 @@ export default function DashboardPage({ user }) {
     },
     {
       title: 'Total Indtægter',
-      value: `${stats.total_indtaegter.toFixed(2)} kr.`,
+      value: formatCurrencyWithUnit(stats.total_indtaegter),
       icon: TrendingUp,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
@@ -359,7 +359,7 @@ export default function DashboardPage({ user }) {
     },
     {
       title: 'Total Udgifter',
-      value: `${stats.total_udgifter.toFixed(2)} kr.`,
+      value: formatCurrencyWithUnit(stats.total_udgifter),
       icon: TrendingDown,
       color: 'text-orange-600',
       bgColor: 'bg-orange-50',
