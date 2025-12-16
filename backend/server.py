@@ -549,6 +549,10 @@ async def upload_receipt(
     kvittering_url = f"/uploads/kvitteringer/{afdeling_navn}/{regnskabsaar}/{safe_filename}"
     await db.transactions.update_one(
         {"id": transaction_id},
+        {"$set": {"kvittering_url": kvittering_url}}
+    )
+    
+    return {"success": True, "url": kvittering_url, "filename": safe_filename}
 
 @api_router.get("/uploads/kvitteringer/{afdeling_navn}/{regnskabsaar}/{filename}")
 async def download_receipt(
