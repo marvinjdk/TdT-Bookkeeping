@@ -280,6 +280,66 @@ backend:
           agent: "testing"
           comment: "CONFIRMED: Department management API endpoints working correctly. Successfully tested CREATE department (Test Afdeling XYZ created) and DELETE department (test department removed). API calls return proper responses and update database correctly."
 
+  - task: "Admin Dashboard Stats API with Afdelinger Saldi"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "NEW: Testing GET /api/dashboard/stats as admin to verify user_id is included in afdelinger_saldi for admin transactions functionality."
+        - working: true
+          agent: "testing"
+          comment: "✅ VERIFIED: Admin dashboard stats API working perfectly. Returns afdelinger_saldi with all required fields including user_id. Found 7 afdelinger: Himmerland (7700.0 kr, user_id: afd-himmerland), and 6 others with 0.0 kr. All departments show correct user_id mapping for transaction filtering."
+
+  - task: "Admin Transactions API by Department"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "NEW: Testing GET /api/transactions?afdeling_id=afd-himmerland as admin to verify correct transaction filtering by department."
+        - working: true
+          agent: "testing"
+          comment: "✅ VERIFIED: Admin transactions filtering by afdeling_id working perfectly. GET /api/transactions?afdeling_id=afd-himmerland returns exactly 2 transactions (B001 and B002) for Himmerland department. All transactions correctly filtered and belong to the specified afdeling_id."
+
+  - task: "Admin All Transactions API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "NEW: Testing GET /api/transactions as admin to verify it returns all transactions across departments with afdeling_id information."
+        - working: true
+          agent: "testing"
+          comment: "✅ VERIFIED: Admin all transactions API working perfectly. GET /api/transactions returns all 2 transactions across departments with afdeling_id field properly populated. Shows transactions grouped by afdeling_id: afd-himmerland has 2 transactions (B001 - Test indtægt, B002 - Test udgift)."
+
+  - task: "Browser Title Configuration"
+    implemented: true
+    working: true
+    file: "/app/frontend/public/index.html"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "NEW: Verifying browser title is set to 'Tour de Taxa - Hold bogføring' as specified in requirements."
+        - working: true
+          agent: "testing"
+          comment: "✅ VERIFIED: Browser title correctly set to 'Tour de Taxa - Hold bogføring' in /app/frontend/public/index.html line 21. Title matches exactly what was specified in the requirements."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
