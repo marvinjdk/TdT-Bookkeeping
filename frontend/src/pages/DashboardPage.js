@@ -126,7 +126,7 @@ export default function DashboardPage({ user }) {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold font-data text-[#109848]">{activeUsers}</div>
+              <div className="text-2xl font-bold text-[#109848]">{activeUsers}</div>
               <p className="text-xs text-slate-500 mt-1">Admins og afdelinger</p>
             </CardContent>
           </Card>
