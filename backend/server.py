@@ -570,6 +570,36 @@ async def download_receipt(
     
     from fastapi.responses import FileResponse
     return FileResponse(
+
+@api_router.get("/kvitteringer/folder")
+async def get_kvitteringer_folder_info(
+    afdeling_navn: str,
+    regnskabsaar: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get information about kvitteringer folder for Excel export"""
+    folder_path = Path(f"/app/uploads/kvitteringer/{afdeling_navn}/{regnskabsaar}")
+    
+    if not folder_path.exists():
+        folder_path.mkdir(parents=True, exist_ok=True)
+    
+    # List files in folder
+    files = []
+    if folder_path.exists():
+        for file_path in folder_path.iterdir():
+            if file_path.is_file():
+                files.append({
+                    "filename": file_path.name,
+                    "size": file_path.stat().st_size,
+                    "url": f"/api/uploads/kvitteringer/{afdeling_navn}/{regnskabsaar}/{file_path.name}"
+                })
+    
+    return {
+        "folder_path": str(folder_path),
+        "files": files,
+        "count": len(files)
+    }
+
         path=file_path,
         filename=filename,
         media_type="application/octet-stream"
