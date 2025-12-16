@@ -191,51 +191,63 @@ frontend:
 
   - task: "Admin Transactions Page - Department Navigation"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/TransactionsPage.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "NEW: Clicking on a department from dashboard should navigate to transactions page and show only that department's transactions. Uses afdeling_navn URL parameter instead of afdeling_id."
+        - working: true
+          agent: "testing"
+          comment: "✅ VERIFIED: Dashboard to transactions navigation working perfectly. Clicking Himmerland button from 'Hold Oversigt' section navigates to /transactions?afdeling_navn=Himmerland. Subtitle correctly shows 'Posteringer for Himmerland', dropdown shows 'Himmerland' selected, and displays exactly 2 transactions (B001 and B002) as expected."
 
   - task: "Admin Transactions Page - Department Column"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/pages/TransactionsPage.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "NEW: When admin views 'Alle hold', a 'Hold' column should be visible showing which department each transaction belongs to."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL ISSUE: Hold column is NOT displayed when viewing 'Alle hold'. When navigating via Posteringer menu to view all transactions, the table headers are: Bilagnr., Bank dato, Tekst, Formål, Beløb, Type, Kvit. - but missing the 'Hold' column. The logic in TransactionsPage.js line 290-292 shows Hold column should appear when selectedAfdelingFilter === 'all', but it's not working correctly."
 
   - task: "Admin Transactions Page - Department Filter Dropdown"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/pages/TransactionsPage.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "NEW: Admin should be able to filter transactions by department using a dropdown. Options include 'Alle hold' and each individual department."
+        - working: false
+          agent: "testing"
+          comment: "❌ PARTIAL ISSUE: Department dropdown shows all 8 options correctly (Alle hold + 7 departments). However, when selecting 'Alle hold' from dropdown, the URL doesn't update correctly and Hold column visibility logic has issues. The dropdown selection works but URL parameter handling and Hold column display need fixes."
 
   - task: "Browser Title"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/public/index.html"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Browser title should show 'Tour de Taxa - Hold bogføring'. Verified in code and playwright test shows correct title."
+        - working: true
+          agent: "testing"
+          comment: "✅ VERIFIED: Browser title correctly displays 'Tour de Taxa - Hold bogføring' as specified in requirements. Title is properly set in /app/frontend/public/index.html."
 
   - task: "Department CRUD Operations"
     implemented: true
