@@ -475,7 +475,8 @@ async def list_transactions(
     projection = {
         "_id": 0, "id": 1, "afdeling_id": 1, "bilagnr": 1, 
         "bank_dato": 1, "tekst": 1, "formal": 1, "belob": 1, 
-        "type": 1, "regnskabsaar": 1, "kvittering_url": 1, "oprettet": 1
+        "type": 1, "regnskabsaar": 1, "kvittering_url": 1, "oprettet": 1,
+        "kvittering_drive_id": 1, "kvittering_drive_link": 1, "kvittering_filename": 1
     }
     transactions = await db.transactions.find(query, projection).sort("bank_dato", -1).to_list(1000)
     return [Transaction(**t) for t in transactions]
