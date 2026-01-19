@@ -123,6 +123,9 @@ class Transaction(BaseModel):
     type: str
     regnskabsaar: Optional[str] = None
     kvittering_url: Optional[str] = None
+    kvittering_drive_id: Optional[str] = None
+    kvittering_drive_link: Optional[str] = None
+    kvittering_filename: Optional[str] = None
     oprettet: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class AfdelingSaldo(BaseModel):
