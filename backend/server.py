@@ -761,6 +761,248 @@ async def get_dashboard_stats(
             antal_posteringer=antal_posteringer
         )
 
+# ==================== GOOGLE DRIVE INTEGRATION ====================
+
+@api_router.get("/drive/connect")
+async def connect_drive(current_user: User = Depends(get_current_user)):
+    """Initiate Google Drive OAuth flow"""
+    if current_user.role != "afdeling":
+        raise HTTPException(status_code=403, detail="Kun afdelinger kan tilslutte Google Drive")
+    
+    authorization_url = get_authorization_url(current_user.id)
+    return {"authorization_url": authorization_url}
+
+
+@api_router.get("/oauth/drive/callback")
+async def drive_oauth_callback(code: str = Query(...), state: str = Query(...)):
+    """Handle Google Drive OAuth callback"""
+    try:
+        result = await handle_oauth_callback(code, state, db)
+        frontend_url = os.getenv("FRONTEND_URL", "https://danishfinance.preview.emergentagent.com")
+        return RedirectResponse(url=f"{frontend_url}/settings?drive_connected=true")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"OAuth callback failed: {str(e)}")
+        frontend_url = os.getenv("FRONTEND_URL", "https://danishfinance.preview.emergentagent.com")
+        return RedirectResponse(url=f"{frontend_url}/settings?drive_error=true")
+
+
+@api_router.get("/drive/status")
+async def get_drive_status(current_user: User = Depends(get_current_user)):
+    """Check if user has connected Google Drive"""
+    if current_user.role != "afdeling":
+        return {"connected": False, "message": "Kun afdelinger kan bruge Google Drive"}
+    
+    status = await check_drive_connection(current_user.id, db)
+    return status
+
+
+@api_router.post("/drive/disconnect")
+async def disconnect_drive_endpoint(current_user: User = Depends(get_current_user)):
+    """Disconnect Google Drive"""
+    if current_user.role != "afdeling":
+        raise HTTPException(status_code=403, detail="Kun afdelinger kan afbryde Google Drive")
+    
+    success = await disconnect_drive(current_user.id, db)
+    if success:
+        return {"success": True, "message": "Google Drive afbrudt"}
+    return {"success": False, "message": "Google Drive var ikke tilsluttet"}
+
+
+@api_router.post("/drive/upload/{transaction_id}")
+async def upload_to_drive(
+    transaction_id: str,
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user)
+):
+    """Upload receipt to Google Drive"""
+    if current_user.role != "afdeling":
+        raise HTTPException(status_code=403, detail="Kun afdelinger kan uploade kvitteringer")
+    
+    # Get transaction
+    transaction = await db.transactions.find_one({"id": transaction_id}, {"_id": 0})
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Postering ikke fundet")
+    
+    if transaction["afdeling_id"] != current_user.id:
+        raise HTTPException(status_code=403, detail="Ingen adgang til denne postering")
+    
+    # Get Drive service
+    service = await get_drive_service(current_user.id, db)
+    
+    # Get settings for regnskabsaar
+    settings = await db.settings.find_one({"afdeling_id": current_user.id}, {"_id": 0})
+    regnskabsaar = transaction.get("regnskabsaar") or (settings.get("regnskabsaar", "2024-2025") if settings else "2024-2025")
+    
+    # Ensure folder structure exists
+    folder_id = await ensure_folder_structure(service, current_user.afdeling_navn, regnskabsaar)
+    
+    # Generate filename with bilagnr
+    file_extension = Path(file.filename).suffix
+    safe_filename = f"{transaction['bilagnr']}_{file.filename}"
+    
+    # Read file content
+    file_content = await file.read()
+    
+    # Upload to Drive
+    result = await upload_file_to_drive(
+        service,
+        file_content,
+        safe_filename,
+        folder_id,
+        file.content_type
+    )
+    
+    # Update transaction with Drive file info
+    await db.transactions.update_one(
+        {"id": transaction_id},
+        {"$set": {
+            "kvittering_drive_id": result["file_id"],
+            "kvittering_drive_link": result["web_view_link"],
+            "kvittering_filename": result["filename"]
+        }}
+    )
+    
+    return {
+        "success": True,
+        "file_id": result["file_id"],
+        "filename": result["filename"],
+        "web_view_link": result["web_view_link"]
+    }
+
+
+@api_router.get("/drive/files")
+async def list_drive_files(
+    regnskabsaar: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """List all receipt files in Google Drive for current user"""
+    if current_user.role != "afdeling":
+        raise HTTPException(status_code=403, detail="Kun afdelinger kan se kvitteringer")
+    
+    # Get Drive service
+    service = await get_drive_service(current_user.id, db)
+    
+    # Get settings for regnskabsaar
+    if not regnskabsaar:
+        settings = await db.settings.find_one({"afdeling_id": current_user.id}, {"_id": 0})
+        regnskabsaar = settings.get("regnskabsaar", "2024-2025") if settings else "2024-2025"
+    
+    # Get folder ID
+    try:
+        folder_id = await ensure_folder_structure(service, current_user.afdeling_navn, regnskabsaar)
+        files = await list_files_in_folder(service, folder_id)
+        return {"files": files, "folder_id": folder_id, "regnskabsaar": regnskabsaar}
+    except Exception as e:
+        logger.error(f"Failed to list Drive files: {e}")
+        return {"files": [], "error": str(e)}
+
+
+@api_router.get("/drive/download/{file_id}")
+async def download_from_drive(
+    file_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Download a receipt file from Google Drive"""
+    if current_user.role != "afdeling":
+        raise HTTPException(status_code=403, detail="Kun afdelinger kan downloade kvitteringer")
+    
+    # Get Drive service
+    service = await get_drive_service(current_user.id, db)
+    
+    try:
+        content, filename, mime_type = await download_file_from_drive(service, file_id)
+        
+        return Response(
+            content=content,
+            media_type=mime_type or "application/octet-stream",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"'
+            }
+        )
+    except Exception as e:
+        logger.error(f"Failed to download file {file_id}: {e}")
+        raise HTTPException(status_code=404, detail="Fil ikke fundet eller ingen adgang")
+
+
+@api_router.delete("/drive/file/{file_id}")
+async def delete_from_drive(
+    file_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a receipt file from Google Drive"""
+    if current_user.role != "afdeling":
+        raise HTTPException(status_code=403, detail="Kun afdelinger kan slette kvitteringer")
+    
+    # Get Drive service
+    service = await get_drive_service(current_user.id, db)
+    
+    success = await delete_file_from_drive(service, file_id)
+    
+    if success:
+        # Also remove from any transactions that reference this file
+        await db.transactions.update_many(
+            {"kvittering_drive_id": file_id},
+            {"$unset": {
+                "kvittering_drive_id": "",
+                "kvittering_drive_link": "",
+                "kvittering_filename": ""
+            }}
+        )
+        return {"success": True, "message": "Fil slettet"}
+    
+    raise HTTPException(status_code=500, detail="Kunne ikke slette fil")
+
+
+@api_router.post("/drive/link/{transaction_id}")
+async def link_existing_file(
+    transaction_id: str,
+    file_id: str = Query(..., description="Google Drive file ID"),
+    current_user: User = Depends(get_current_user)
+):
+    """Link an existing Google Drive file to a transaction"""
+    if current_user.role != "afdeling":
+        raise HTTPException(status_code=403, detail="Kun afdelinger kan linke kvitteringer")
+    
+    # Get transaction
+    transaction = await db.transactions.find_one({"id": transaction_id}, {"_id": 0})
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Postering ikke fundet")
+    
+    if transaction["afdeling_id"] != current_user.id:
+        raise HTTPException(status_code=403, detail="Ingen adgang til denne postering")
+    
+    # Get Drive service and file info
+    service = await get_drive_service(current_user.id, db)
+    
+    try:
+        file_metadata = service.files().get(
+            fileId=file_id,
+            fields='id, name, webViewLink'
+        ).execute()
+        
+        # Update transaction
+        await db.transactions.update_one(
+            {"id": transaction_id},
+            {"$set": {
+                "kvittering_drive_id": file_metadata.get('id'),
+                "kvittering_drive_link": file_metadata.get('webViewLink'),
+                "kvittering_filename": file_metadata.get('name')
+            }}
+        )
+        
+        return {
+            "success": True,
+            "file_id": file_metadata.get('id'),
+            "filename": file_metadata.get('name'),
+            "web_view_link": file_metadata.get('webViewLink')
+        }
+    except Exception as e:
+        logger.error(f"Failed to link file {file_id}: {e}")
+        raise HTTPException(status_code=404, detail="Fil ikke fundet eller ingen adgang")
+
+
 # Excel export
 @api_router.get("/export/excel")
 async def export_excel(
