@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/App';
 import { Button } from '@/components/ui/button';
@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, Upload } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Cloud, CloudOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 const FORMAL_OPTIONS = [
@@ -27,6 +27,7 @@ export default function NewTransactionPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [driveConnected, setDriveConnected] = useState(false);
   const [formData, setFormData] = useState({
     bank_dato: '',
     tekst: '',
@@ -35,6 +36,19 @@ export default function NewTransactionPage() {
     type: 'udgift',
   });
   const [file, setFile] = useState(null);
+
+  useEffect(() => {
+    checkDriveStatus();
+  }, []);
+
+  const checkDriveStatus = async () => {
+    try {
+      const res = await api.get('/drive/status');
+      setDriveConnected(res.data.connected);
+    } catch (error) {
+      console.error('Could not check Drive status');
+    }
+  };
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -57,12 +71,28 @@ export default function NewTransactionPage() {
         setUploadingFile(true);
         const fileFormData = new FormData();
         fileFormData.append('file', file);
-        await api.post(`/transactions/${res.data.id}/upload`, fileFormData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        
+        // Use Google Drive if connected, otherwise use local storage
+        const uploadEndpoint = driveConnected 
+          ? `/drive/upload/${res.data.id}`
+          : `/transactions/${res.data.id}/upload`;
+        
+        try {
+          await api.post(uploadEndpoint, fileFormData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+          toast.success(driveConnected 
+            ? 'Postering oprettet og kvittering gemt i Google Drive!' 
+            : 'Postering oprettet med kvittering!'
+          );
+        } catch (uploadError) {
+          console.error('Upload failed:', uploadError);
+          toast.warning('Postering oprettet, men kvittering kunne ikke uploades');
+        }
+      } else {
+        toast.success('Postering oprettet!');
       }
 
-      toast.success('Postering oprettet!');
       navigate('/transactions');
     } catch (error) {
       toast.error('Kunne ikke oprette postering');
@@ -172,7 +202,20 @@ export default function NewTransactionPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="file" className="text-slate-700 font-medium">Kvittering (valgfrit)</Label>
+              <Label htmlFor="file" className="text-slate-700 font-medium flex items-center gap-2">
+                Kvittering (valgfrit)
+                {driveConnected ? (
+                  <span className="inline-flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+                    <Cloud size={12} />
+                    Gemmes i Google Drive
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-xs text-slate-500 bg-slate-50 px-2 py-0.5 rounded">
+                    <CloudOff size={12} />
+                    Lokal lagring
+                  </span>
+                )}
+              </Label>
               <Input
                 id="file"
                 type="file"
@@ -182,6 +225,11 @@ export default function NewTransactionPage() {
                 className="bg-white border-slate-200 focus:border-[#109848] focus:ring-2 focus:ring-[#109848]/20"
               />
               {file && <p className="text-sm text-slate-600 mt-1">Valgt fil: {file.name}</p>}
+              {!driveConnected && (
+                <p className="text-xs text-slate-500">
+                  Tip: Tilslut Google Drive i Indstillinger for at gemme kvitteringer i skyen
+                </p>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
