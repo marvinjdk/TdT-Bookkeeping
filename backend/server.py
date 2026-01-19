@@ -1,6 +1,6 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, UploadFile, File, status
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, UploadFile, File, status, Query
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, RedirectResponse, Response
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -16,6 +16,20 @@ from jose import JWTError, jwt
 import io
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
+
+# Google Drive imports
+from google_drive_service import (
+    get_authorization_url,
+    handle_oauth_callback,
+    get_drive_service,
+    ensure_folder_structure,
+    upload_file_to_drive,
+    list_files_in_folder,
+    download_file_from_drive,
+    delete_file_from_drive,
+    check_drive_connection,
+    disconnect_drive
+)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
