@@ -1051,6 +1051,7 @@ async def export_excel(
     current_user: User = Depends(get_current_user)
 ):
     wb = Workbook()
+    receipt_files = []  # Collect receipt files to include in ZIP
     
     # If admin and no specific afdeling_id, export all with separate sheets
     if current_user.role == "admin" and not afdeling_id:
@@ -1063,7 +1064,8 @@ async def export_excel(
         # Create sheet for each afdeling
         all_transactions = []
         for afdeling in afdelinger:
-            await create_afdeling_sheet(wb, afdeling["id"], afdeling["afdeling_navn"], regnskabsaar)
+            sheet_receipts = await create_afdeling_sheet(wb, afdeling["id"], afdeling["afdeling_navn"], regnskabsaar)
+            receipt_files.extend(sheet_receipts)
             
             # Build query with optional regnskabsaar filter
             query = {"afdeling_id": afdeling["id"]}
@@ -1116,18 +1118,44 @@ async def export_excel(
         afdeling_navn = afdeling_user.get("afdeling_navn", "Bogføring") if afdeling_user else "Bogføring"
         
         wb.remove(wb.active)
-        await create_afdeling_sheet(wb, target_afdeling_id, afdeling_navn, regnskabsaar)
+        sheet_receipts = await create_afdeling_sheet(wb, target_afdeling_id, afdeling_navn, regnskabsaar)
+        receipt_files.extend(sheet_receipts)
     
-    # Save to bytes
-    output = io.BytesIO()
-    wb.save(output)
-    output.seek(0)
+    # Save Excel to bytes
+    excel_output = io.BytesIO()
+    wb.save(excel_output)
+    excel_output.seek(0)
     
-    return StreamingResponse(
-        output,
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": "attachment; filename=tour_de_taxa_bogforing.xlsx"}
-    )
+    # If there are receipt files, create a ZIP
+    if receipt_files:
+        zip_output = io.BytesIO()
+        with zipfile.ZipFile(zip_output, 'w', zipfile.ZIP_DEFLATED) as zf:
+            # Add Excel file
+            zf.writestr("tour_de_taxa_bogforing.xlsx", excel_output.read())
+            
+            # Add receipt files
+            for receipt in receipt_files:
+                file_path = Path(receipt["path"])
+                if file_path.exists():
+                    # Organize in subfolders: kvitteringer/[afdeling]/[filename]
+                    archive_path = f"kvitteringer/{receipt['afdeling']}/{file_path.name}"
+                    zf.write(file_path, archive_path)
+        
+        zip_output.seek(0)
+        
+        year_suffix = f"_{regnskabsaar}" if regnskabsaar else ""
+        return StreamingResponse(
+            zip_output,
+            media_type="application/zip",
+            headers={"Content-Disposition": f"attachment; filename=tour_de_taxa_bogforing{year_suffix}.zip"}
+        )
+    else:
+        # No receipts, just return Excel
+        return StreamingResponse(
+            excel_output,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": "attachment; filename=tour_de_taxa_bogforing.xlsx"}
+        )
 
 async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn, regnskabsaar=None):
     """Create a sheet for a specific afdeling with startsaldo and aktuel saldo"""
