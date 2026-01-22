@@ -81,7 +81,7 @@ export default function TransactionsPage({ user }) {
 
   useEffect(() => {
     applyFilters();
-  }, [transactions, searchTerm, typeFilter, formalFilter]);
+  }, [transactions, searchTerm, typeFilter, formalFilter, sortColumn, sortDirection]);
 
   const fetchAfdelinger = async () => {
     try {
