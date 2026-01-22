@@ -53,11 +53,12 @@ export default function ExportPage({ user }) {
       const token = localStorage.getItem('token');
       const params = new URLSearchParams();
       
-      if (selectedAfdeling !== 'all') {
+      if (isAdmin && selectedAfdeling !== 'all') {
         params.append('afdeling_id', selectedAfdeling);
       }
       
-      if (selectedRegnskabsaar && selectedRegnskabsaar !== 'current') {
+      // Always include regnskabsaar
+      if (selectedRegnskabsaar) {
         params.append('regnskabsaar', selectedRegnskabsaar);
       }
       
@@ -72,7 +73,7 @@ export default function ExportPage({ user }) {
 
       // Get filename from Content-Disposition header or use default
       const contentDisposition = response.headers.get('Content-Disposition');
-      let filename = 'tour_de_taxa_bogforing.xlsx';
+      let filename = `tour_de_taxa_bogforing_${selectedRegnskabsaar || 'alle'}.xlsx`;
       
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
@@ -93,9 +94,9 @@ export default function ExportPage({ user }) {
 
       // Show appropriate message based on file type
       if (filename.endsWith('.zip')) {
-        toast.success('ZIP-fil med Excel og kvitteringer downloadet!');
+        toast.success(`ZIP-fil for ${selectedRegnskabsaar} downloadet!`);
       } else {
-        toast.success('Excel-fil downloadet!');
+        toast.success(`Excel-fil for ${selectedRegnskabsaar} downloadet!`);
       }
     } catch (error) {
       toast.error('Kunne ikke eksportere til Excel');
