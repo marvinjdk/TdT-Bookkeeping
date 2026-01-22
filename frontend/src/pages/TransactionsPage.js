@@ -36,6 +36,8 @@ export default function TransactionsPage({ user }) {
   const [selectedAfdelingFilter, setSelectedAfdelingFilter] = useState('all');
   const [regnskabsaarList, setRegnskabsaarList] = useState([]);
   const [selectedRegnskabsaar, setSelectedRegnskabsaar] = useState('');
+  const [sortColumn, setSortColumn] = useState('bilagnr');
+  const [sortDirection, setSortDirection] = useState('asc');
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   
