@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TrendingUp, TrendingDown, FileText, Wallet, Users as UsersIcon, Plus, Key } from 'lucide-react';
+import { TrendingUp, TrendingDown, FileText, Wallet, Users as UsersIcon, Plus, Key, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatCurrencyWithUnit, formatCurrency } from '@/utils/formatNumber';
 
@@ -21,6 +21,8 @@ export default function DashboardPage({ user }) {
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newPassword, setNewPassword] = useState('');
+  const [regnskabsaarList, setRegnskabsaarList] = useState([]);
+  const [selectedRegnskabsaar, setSelectedRegnskabsaar] = useState('');
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -29,19 +31,42 @@ export default function DashboardPage({ user }) {
   });
   const navigate = useNavigate();
   const isSuperbruger = user.role === 'superbruger';
+  const isAdmin = user.role === 'admin' || user.role === 'superbruger';
 
   useEffect(() => {
     if (isSuperbruger) {
       fetchUsers();
       fetchAfdelinger();
     } else {
-      fetchStats();
+      fetchRegnskabsaar();
     }
   }, [isSuperbruger]);
 
-  const fetchStats = async () => {
+  useEffect(() => {
+    if (!isSuperbruger && selectedRegnskabsaar) {
+      fetchStats(selectedRegnskabsaar);
+    }
+  }, [selectedRegnskabsaar, isSuperbruger]);
+
+  const fetchRegnskabsaar = async () => {
     try {
-      const res = await api.get('/dashboard/stats');
+      const res = await api.get('/historik/regnskabsaar');
+      const years = res.data.regnskabsaar || [];
+      setRegnskabsaarList(years);
+      if (years.length > 0) {
+        setSelectedRegnskabsaar(years[0]); // Default to most recent
+      }
+    } catch (error) {
+      console.error('Kunne ikke hente regnskabsår');
+      // Fallback - fetch stats without year filter
+      fetchStats();
+    }
+  };
+
+  const fetchStats = async (regnskabsaar = null) => {
+    try {
+      const params = regnskabsaar ? `?regnskabsaar=${regnskabsaar}` : '';
+      const res = await api.get(`/dashboard/stats${params}`);
       setStats(res.data);
     } catch (error) {
       toast.error('Kunne ikke hente statistik');
