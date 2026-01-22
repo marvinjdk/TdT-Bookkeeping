@@ -405,9 +405,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Receipt Upload Flow (P2)"
-    - "Historical Data Viewing (P1)"
-  stuck_tasks: []
+    - "Department User Regnskabsår Access"
+    - "Admin Transactions Page - Department Column"
+    - "Admin Transactions Page - Department Filter Dropdown"
+  stuck_tasks:
+    - "Department User Regnskabsår Access"
   test_all: false
   test_priority: "high_first"
 
