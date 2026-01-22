@@ -262,6 +262,36 @@ frontend:
           comment: "Department CRUD operations tested successfully. CREATE: Successfully created 'Test Afdeling XYZ' department. DELETE: Successfully deleted test department. Department management dialog shows all existing departments with delete buttons. Minor: Modal overlay issues prevent some interactions but core functionality works."
 
 backend:
+  - task: "Receipt Upload Flow (P2)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "NEW TASK: Testing complete receipt upload flow - create transaction, upload file, verify kvittering_url, download receipt, test Excel export with receipt links."
+        - working: true
+          agent: "testing"
+          comment: "✅ VERIFIED: Receipt upload flow working perfectly! 1) Created transaction successfully 2) Uploaded receipt file via POST /api/transactions/{id}/upload 3) Transaction has kvittering_url set correctly 4) Receipt download works via both endpoint formats: /api/uploads/kvitteringer/{afdeling}/{regnskabsaar}/{filename} and /api/kvittering/{regnskabsaar}/{afdeling}/{filename} 5) Excel export includes receipt folder links. All P2 requirements met."
+
+  - task: "Historical Data Viewing (P1)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "NEW TASK: Testing historical data viewing with regnskabsår filtering - GET /api/historik/regnskabsaar, dashboard stats by year, transactions by year."
+        - working: true
+          agent: "testing"
+          comment: "✅ VERIFIED: Historical data viewing working correctly! 1) GET /api/historik/regnskabsaar returns ['2025-2026', '2024-2025'] as expected 2) GET /api/dashboard/stats?regnskabsaar=2024-2025 returns stats with 3 transactions 3) GET /api/dashboard/stats?regnskabsaar=2025-2026 returns stats with 1 transaction (minor: expected 0 but has 1 from testing) 4) GET /api/transactions?regnskabsaar=2024-2025 returns 3 transactions 5) GET /api/transactions?regnskabsaar=2025-2026 returns 1 transaction. All P1 requirements met with minor data variance due to test transactions."
+
   - task: "Superuser Authentication"
     implemented: true
     working: true
