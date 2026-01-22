@@ -465,11 +465,11 @@ async def list_transactions(
     query = {}
     if current_user.role == "afdeling":
         query["afdeling_id"] = current_user.id
-    elif current_user.role == "admin" and afdeling_id:
+    elif current_user.role in ["admin", "superbruger"] and afdeling_id:
         query["afdeling_id"] = afdeling_id
     
-    # Filter by regnskabsaar if provided (admin only)
-    if regnskabsaar and current_user.role in ["admin", "superbruger"]:
+    # Filter by regnskabsaar if provided (for all users)
+    if regnskabsaar:
         query["regnskabsaar"] = regnskabsaar
     
     projection = {
