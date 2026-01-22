@@ -1130,32 +1130,38 @@ async def export_excel(
     # If there are receipt files, create a ZIP
     if receipt_files:
         zip_output = io.BytesIO()
+        year_suffix = f"_{regnskabsaar}" if regnskabsaar else ""
+        
         with zipfile.ZipFile(zip_output, 'w', zipfile.ZIP_DEFLATED) as zf:
-            # Add Excel file
-            zf.writestr("tour_de_taxa_bogforing.xlsx", excel_output.read())
+            # Add Excel file with regnskabsår in name
+            excel_filename = f"tour_de_taxa_bogforing{year_suffix}.xlsx"
+            zf.writestr(excel_filename, excel_output.read())
             
-            # Add receipt files
+            # Add receipt files in folder with regnskabsår
             for receipt in receipt_files:
                 file_path = Path(receipt["path"])
                 if file_path.exists():
-                    # Organize in subfolders: kvitteringer/[afdeling]/[filename]
-                    archive_path = f"kvitteringer/{receipt['afdeling']}/{file_path.name}"
+                    # Organize in subfolders: kvitteringer_[regnskabsaar]/[afdeling]/[filename]
+                    folder_name = f"kvitteringer{year_suffix}"
+                    archive_path = f"{folder_name}/{receipt['afdeling']}/{file_path.name}"
                     zf.write(file_path, archive_path)
         
         zip_output.seek(0)
         
-        year_suffix = f"_{regnskabsaar}" if regnskabsaar else ""
+        zip_filename = f"tour_de_taxa_bogforing{year_suffix}.zip"
         return StreamingResponse(
             zip_output,
             media_type="application/zip",
-            headers={"Content-Disposition": f"attachment; filename=tour_de_taxa_bogforing{year_suffix}.zip"}
+            headers={"Content-Disposition": f"attachment; filename={zip_filename}"}
         )
     else:
         # No receipts, just return Excel
+        year_suffix = f"_{regnskabsaar}" if regnskabsaar else ""
+        excel_filename = f"tour_de_taxa_bogforing{year_suffix}.xlsx"
         return StreamingResponse(
             excel_output,
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={"Content-Disposition": "attachment; filename=tour_de_taxa_bogforing.xlsx"}
+            headers={"Content-Disposition": f"attachment; filename={excel_filename}"}
         )
 
 async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn, regnskabsaar=None):
