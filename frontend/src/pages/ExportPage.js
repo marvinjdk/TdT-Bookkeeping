@@ -63,20 +63,33 @@ export default function ExportPage({ user }) {
 
       if (!response.ok) throw new Error('Export fejlede');
 
+      // Get filename from Content-Disposition header or use default
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = 'tour_de_taxa_bogforing.xlsx';
+      
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1].replace(/['"]/g, '');
+        }
+      }
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      const filename = selectedAfdeling === 'all' 
-        ? `tour_de_taxa_alle_hold_${new Date().toISOString().split('T')[0]}.xlsx`
-        : `tour_de_taxa_${new Date().toISOString().split('T')[0]}.xlsx`;
       a.download = filename;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
-      toast.success('Excel-fil downloadet!');
+      // Show appropriate message based on file type
+      if (filename.endsWith('.zip')) {
+        toast.success('ZIP-fil med Excel og kvitteringer downloadet!');
+      } else {
+        toast.success('Excel-fil downloadet!');
+      }
     } catch (error) {
       toast.error('Kunne ikke eksportere til Excel');
     } finally {
