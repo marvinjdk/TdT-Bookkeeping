@@ -402,9 +402,30 @@ export default function DashboardPage({ user }) {
 
   return (
     <div className="p-4 md:p-6 lg:p-12 space-y-6" data-testid="dashboard-page">
-      <div>
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">Dashboard</h1>
-        <p className="text-base md:text-lg text-slate-600 mt-2">Velkommen til {user.afdeling_navn || 'Tour de Taxa'}</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">Dashboard</h1>
+          <p className="text-base md:text-lg text-slate-600 mt-2">Velkommen til {user.afdeling_navn || 'Tour de Taxa'}</p>
+        </div>
+        
+        {/* Regnskabsår selector */}
+        {regnskabsaarList.length > 0 && (
+          <div className="flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-slate-500" />
+            <Select value={selectedRegnskabsaar} onValueChange={setSelectedRegnskabsaar}>
+              <SelectTrigger className="w-[160px] bg-white border-slate-200" data-testid="regnskabsaar-select">
+                <SelectValue placeholder="Vælg år" />
+              </SelectTrigger>
+              <SelectContent>
+                {regnskabsaarList.map((year) => (
+                  <SelectItem key={year} value={year}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       {/* Samlet saldo for alle hold (kun for admin) */}
