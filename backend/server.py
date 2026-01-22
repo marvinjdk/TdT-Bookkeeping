@@ -1189,18 +1189,23 @@ async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn, regnskabsaar=Non
     kvit_regnskabsaar = regnskabsaar if regnskabsaar else (settings.get("regnskabsaar", "2024-2025") if settings else "2024-2025")
     for t in transactions:
         if t.get("kvittering_url"):
-            # Extract filename from URL like /api/uploads/kvitteringer/Afdeling/2024-2025/filename.pdf
+            # Extract path from URL like /uploads/kvitteringer/Afdeling/2024-2025/filename.pdf
+            # or /api/uploads/kvitteringer/Afdeling/2024-2025/filename.pdf
             try:
-                url_parts = t["kvittering_url"].split("/")
-                filename = url_parts[-1] if url_parts else None
-                if filename:
-                    file_path = Path(f"/app/uploads/kvitteringer/{afdeling_navn}/{kvit_regnskabsaar}/{filename}")
-                    if file_path.exists():
-                        receipt_files.append({
-                            "path": str(file_path),
-                            "afdeling": afdeling_navn,
-                            "bilagnr": t.get("bilagnr", "unknown")
-                        })
+                url = t["kvittering_url"]
+                # Remove /api prefix if present
+                if url.startswith("/api"):
+                    url = url[4:]
+                # Build full path
+                file_path = Path(f"/app{url}")
+                if file_path.exists():
+                    receipt_files.append({
+                        "path": str(file_path),
+                        "afdeling": afdeling_navn,
+                        "bilagnr": t.get("bilagnr", "unknown")
+                    })
+                else:
+                    logger.warning(f"Receipt file not found: {file_path}")
             except Exception as e:
                 logger.warning(f"Could not process receipt file: {e}")
     
