@@ -121,42 +121,44 @@ export default function ExportPage({ user }) {
             Download posteringer til en Excel-fil. Filen indeholder alle kolonner (Hold, Bilagnr., Bank dato, Tekst, Formål, Beløb, Type) plus startsaldo og aktuel saldo.
           </p>
 
-          {user.role === 'admin' && (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="regnskabsaar-select" className="text-slate-700 font-medium">Vælg regnskabsår</Label>
-                <Select value={selectedRegnskabsaar} onValueChange={setSelectedRegnskabsaar}>
-                  <SelectTrigger id="regnskabsaar-select" data-testid="regnskabsaar-select">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    <SelectItem value="current">Nuværende periode</SelectItem>
-                    {regnskabsaarList.map((aar) => (
-                      <SelectItem key={aar} value={aar}>
-                        {aar}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="afdeling-select" className="text-slate-700 font-medium">Vælg hold</Label>
-                <Select value={selectedAfdeling} onValueChange={setSelectedAfdeling}>
-                  <SelectTrigger id="afdeling-select" data-testid="afdeling-select">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    <SelectItem value="all">Alle hold (separate ark)</SelectItem>
-                    {afdelinger.map((afd) => (
-                      <SelectItem key={afd.id} value={afd.id}>
-                        {afd.afdeling_navn}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </>
+          {/* Regnskabsår selector - for all users */}
+          <div className="space-y-2">
+            <Label htmlFor="regnskabsaar-select" className="text-slate-700 font-medium flex items-center gap-2">
+              <Calendar size={16} />
+              Vælg regnskabsår
+            </Label>
+            <Select value={selectedRegnskabsaar} onValueChange={setSelectedRegnskabsaar}>
+              <SelectTrigger id="regnskabsaar-select" data-testid="regnskabsaar-select" className="w-full md:w-[250px]">
+                <SelectValue placeholder="Vælg regnskabsår" />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                {regnskabsaarList.map((aar) => (
+                  <SelectItem key={aar} value={aar}>
+                    {aar} {aar === currentRegnskabsaar && '(nuværende)'}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Afdeling selector - only for admin */}
+          {isAdmin && (
+            <div className="space-y-2">
+              <Label htmlFor="afdeling-select" className="text-slate-700 font-medium">Vælg hold</Label>
+              <Select value={selectedAfdeling} onValueChange={setSelectedAfdeling}>
+                <SelectTrigger id="afdeling-select" data-testid="afdeling-select" className="w-full md:w-[250px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  <SelectItem value="all">Alle hold (separate ark)</SelectItem>
+                  {afdelinger.map((afd) => (
+                    <SelectItem key={afd.id} value={afd.id}>
+                      {afd.afdeling_navn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           )}
           
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
@@ -166,7 +168,7 @@ export default function ExportPage({ user }) {
               <li>Alle posteringer sorteret efter bank dato</li>
               <li>Aktuel saldo beregnet (startsaldo + indtægter - udgifter)</li>
               <li className="text-blue-700 font-medium">Alle kvitteringsfiler (downloades som ZIP)</li>
-              {user.role === 'admin' && selectedAfdeling === 'all' && (
+              {isAdmin && selectedAfdeling === 'all' && (
                 <>
                   <li>Separate faneblade per hold</li>
                   <li>Samlet ark med alle posteringer</li>
