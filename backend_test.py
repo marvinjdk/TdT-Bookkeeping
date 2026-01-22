@@ -418,12 +418,16 @@ class BogforingsappAPITester:
             print("⏭️  Skipping admin all transactions test - not an admin user")
             return True
 
-    def test_excel_export(self):
+    def test_excel_export(self, regnskabsaar=None):
         """Test Excel export"""
+        endpoint = "export/excel"
+        if regnskabsaar:
+            endpoint += f"?regnskabsaar={regnskabsaar}"
+            
         success, response = self.run_test(
-            "Excel Export",
+            f"Excel Export{' for ' + regnskabsaar if regnskabsaar else ''}",
             "GET",
-            "export/excel",
+            endpoint,
             200
         )
         return success
