@@ -232,7 +232,26 @@ export default function AdminPage({ user }) {
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">Admin Panel</h1>
           <p className="text-base md:text-lg text-slate-600 mt-2">Administrer brugere og afdelinger</p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-start sm:items-center">
+          {/* Regnskabsår selector */}
+          {regnskabsaarList.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-slate-500" />
+              <Select value={selectedRegnskabsaar} onValueChange={setSelectedRegnskabsaar}>
+                <SelectTrigger className="w-[160px] bg-white border-slate-200" data-testid="regnskabsaar-select">
+                  <SelectValue placeholder="Vælg år" />
+                </SelectTrigger>
+                <SelectContent>
+                  {regnskabsaarList.map((year) => (
+                    <SelectItem key={year} value={year}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          
           {currentUser.role === 'admin' && (
             <Button
               onClick={() => navigate('/admin/settings')}
