@@ -169,7 +169,66 @@ export default function TransactionsPage({ user }) {
       filtered = filtered.filter((t) => t.formal === formalFilter);
     }
 
+    // Apply sorting
+    filtered.sort((a, b) => {
+      let aVal = a[sortColumn];
+      let bVal = b[sortColumn];
+      
+      // Handle bilagnr sorting (extract number from B001, B002, etc.)
+      if (sortColumn === 'bilagnr') {
+        const aNum = parseInt(aVal.replace(/\D/g, '')) || 0;
+        const bNum = parseInt(bVal.replace(/\D/g, '')) || 0;
+        return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
+      }
+      
+      // Handle date sorting
+      if (sortColumn === 'bank_dato') {
+        // Convert DD-MM-YYYY or YYYY-MM-DD to sortable format
+        const parseDate = (dateStr) => {
+          if (!dateStr) return 0;
+          if (dateStr.includes('-') && dateStr.length === 10) {
+            const parts = dateStr.split('-');
+            if (parts[0].length === 4) {
+              // YYYY-MM-DD format
+              return new Date(dateStr).getTime();
+            } else {
+              // DD-MM-YYYY format
+              return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`).getTime();
+            }
+          }
+          return 0;
+        };
+        aVal = parseDate(aVal);
+        bVal = parseDate(bVal);
+      }
+      
+      // Handle number sorting (beløb)
+      if (sortColumn === 'belob') {
+        aVal = parseFloat(aVal) || 0;
+        bVal = parseFloat(bVal) || 0;
+      }
+      
+      // Default string comparison
+      if (typeof aVal === 'string') {
+        aVal = aVal.toLowerCase();
+        bVal = (bVal || '').toLowerCase();
+      }
+      
+      if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+
     setFilteredTransactions(filtered);
+  };
+
+  const handleSort = (column) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
   };
 
   const handleDelete = async (id) => {
