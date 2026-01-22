@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test Admin transactions page - clicking on a department from dashboard should show transactions. Admin should be able to see which department each transaction belongs to, filter by department, and view all transactions."
+user_problem_statement: "Test the complete receipt upload flow: 1) Upload a receipt to a transaction 2) View/download the receipt 3) Verify receipt link in Excel export. Also verify the historical data viewing feature with regnskabsår dropdown on Dashboard, Admin and Transactions pages."
 
 frontend:
   - task: "Admin Dashboard Total Balance Summary Card"
