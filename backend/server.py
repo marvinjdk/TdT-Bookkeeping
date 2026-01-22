@@ -14,6 +14,7 @@ from datetime import datetime, timezone, timedelta
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 import io
+import zipfile
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 
