@@ -24,6 +24,21 @@ const FORMAL_OPTIONS = [
   'Sponsorater',
 ];
 
+// Format date to DD-MM-YYYY
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  // If already in DD-MM-YYYY format, return as is
+  if (dateStr.match(/^\d{2}-\d{2}-\d{4}$/)) {
+    return dateStr;
+  }
+  // If in YYYY-MM-DD format, convert to DD-MM-YYYY
+  if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    const [year, month, day] = dateStr.split('-');
+    return `${day}-${month}-${year}`;
+  }
+  return dateStr;
+};
+
 export default function TransactionsPage({ user }) {
   const [transactions, setTransactions] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
