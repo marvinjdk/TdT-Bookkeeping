@@ -185,6 +185,11 @@ export default function TransactionsPage({ user }) {
       filtered = filtered.filter((t) => t.formal === formalFilter);
     }
 
+    // Filter for missing receipts
+    if (showMissingReceipts) {
+      filtered = filtered.filter((t) => !t.kvittering_url && !t.kvittering_drive_link);
+    }
+
     // Apply sorting
     filtered.sort((a, b) => {
       let aVal = a[sortColumn];
