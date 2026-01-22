@@ -1,18 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { api } from '@/App';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Save } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Google Drive feature is disabled for now - will be enabled later
-const GOOGLE_DRIVE_ENABLED = false;
-
 export default function SettingsPage({ user }) {
-  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
@@ -21,27 +16,14 @@ export default function SettingsPage({ user }) {
     periode_slut: '30-09-2025',
     regnskabsaar: '2024-2025',
   });
-  
-  // Google Drive state
-  const [driveStatus, setDriveStatus] = useState({ connected: false });
-  const [driveLoading, setDriveLoading] = useState(false);
 
   useEffect(() => {
     if (user.role === 'afdeling') {
       fetchSettings();
-      fetchDriveStatus();
     } else {
       setLoading(false);
     }
-    
-    // Check for drive connection success/error from URL params
-    if (searchParams.get('drive_connected') === 'true') {
-      toast.success('Google Drive tilsluttet!');
-      fetchDriveStatus();
-    } else if (searchParams.get('drive_error') === 'true') {
-      toast.error('Kunne ikke tilslutte Google Drive');
-    }
-  }, [searchParams]);
+  }, []);
 
   const fetchSettings = async () => {
     try {
@@ -56,44 +38,6 @@ export default function SettingsPage({ user }) {
       toast.error('Kunne ikke hente indstillinger');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchDriveStatus = async () => {
-    try {
-      const res = await api.get('/drive/status');
-      setDriveStatus(res.data);
-    } catch (error) {
-      console.error('Kunne ikke hente Drive status', error);
-    }
-  };
-
-  const handleConnectDrive = async () => {
-    setDriveLoading(true);
-    try {
-      const res = await api.get('/drive/connect');
-      // Redirect to Google OAuth
-      window.location.href = res.data.authorization_url;
-    } catch (error) {
-      toast.error('Kunne ikke starte Google Drive tilslutning');
-      setDriveLoading(false);
-    }
-  };
-
-  const handleDisconnectDrive = async () => {
-    if (!window.confirm('Er du sikker på, at du vil afbryde Google Drive? Dine filer forbliver i Drive.')) {
-      return;
-    }
-    
-    setDriveLoading(true);
-    try {
-      await api.post('/drive/disconnect');
-      setDriveStatus({ connected: false });
-      toast.success('Google Drive afbrudt');
-    } catch (error) {
-      toast.error('Kunne ikke afbryde Google Drive');
-    } finally {
-      setDriveLoading(false);
     }
   };
 
@@ -134,84 +78,6 @@ export default function SettingsPage({ user }) {
         <p className="text-base md:text-lg text-slate-600 mt-2">Administrer regnskabsindstillinger</p>
       </div>
 
-      {/* Google Drive Card */}
-      <Card className="bg-white border border-slate-100 shadow-sm w-full">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold flex items-center gap-2">
-            <Cloud className="w-5 h-5 text-blue-500" />
-            Google Drive
-          </CardTitle>
-          <CardDescription>
-            Gem kvitteringer direkte i din Google Drive
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {driveStatus.connected ? (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
-                <CheckCircle className="w-6 h-6 text-green-600" />
-                <div>
-                  <p className="font-medium text-green-900">Google Drive er tilsluttet</p>
-                  <p className="text-sm text-green-700">
-                    Kvitteringer gemmes i: Tour de Taxa/Kvitteringer/{user.afdeling_navn}/{settings.regnskabsaar}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  onClick={() => window.open('https://drive.google.com', '_blank')}
-                  className="flex items-center gap-2"
-                >
-                  <ExternalLink size={16} />
-                  Åbn Google Drive
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleDisconnectDrive}
-                  disabled={driveLoading}
-                  className="text-red-600 border-red-200 hover:bg-red-50"
-                >
-                  {driveLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  ) : (
-                    <CloudOff size={16} className="mr-2" />
-                  )}
-                  Afbryd
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
-                <AlertCircle className="w-6 h-6 text-slate-500" />
-                <div>
-                  <p className="font-medium text-slate-900">Google Drive er ikke tilsluttet</p>
-                  <p className="text-sm text-slate-600">
-                    Tilslut din Google Drive for at gemme kvitteringer i skyen
-                  </p>
-                </div>
-              </div>
-              
-              <Button
-                onClick={handleConnectDrive}
-                disabled={driveLoading}
-                className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
-              >
-                {driveLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Cloud size={18} />
-                )}
-                Tilslut Google Drive
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Settings Card */}
       <Card className="bg-white border border-slate-100 shadow-sm w-full">
         <CardHeader>
           <CardTitle className="text-xl font-semibold">Regnskabsoplysninger</CardTitle>
