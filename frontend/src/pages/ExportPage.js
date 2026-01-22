@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Download } from 'lucide-react';
+import { Download, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function ExportPage({ user }) {
@@ -12,14 +12,17 @@ export default function ExportPage({ user }) {
   const [afdelinger, setAfdelinger] = useState([]);
   const [selectedAfdeling, setSelectedAfdeling] = useState('all');
   const [regnskabsaarList, setRegnskabsaarList] = useState([]);
-  const [selectedRegnskabsaar, setSelectedRegnskabsaar] = useState('current');
+  const [selectedRegnskabsaar, setSelectedRegnskabsaar] = useState('');
+  const [currentRegnskabsaar, setCurrentRegnskabsaar] = useState('');
+
+  const isAdmin = user.role === 'admin' || user.role === 'superbruger';
 
   useEffect(() => {
-    if (user.role === 'admin') {
+    fetchRegnskabsaar();
+    if (isAdmin) {
       fetchAfdelinger();
-      fetchRegnskabsaar();
     }
-  }, [user]);
+  }, [user, isAdmin]);
 
   const fetchAfdelinger = async () => {
     try {
@@ -34,7 +37,11 @@ export default function ExportPage({ user }) {
   const fetchRegnskabsaar = async () => {
     try {
       const res = await api.get('/historik/regnskabsaar');
-      setRegnskabsaarList(res.data.regnskabsaar || []);
+      const years = res.data.regnskabsaar || [];
+      const current = res.data.current || (years.length > 0 ? years[0] : '');
+      setRegnskabsaarList(years);
+      setCurrentRegnskabsaar(current);
+      setSelectedRegnskabsaar(current);
     } catch (error) {
       console.error('Kunne ikke hente regnskabsår');
     }
