@@ -81,7 +81,19 @@ export default function Layout({ user, setUser }) {
             <h1 className="text-xl font-bold text-[#109848] tracking-tight text-center">Tour de Taxa</h1>
             <p className="text-xs text-slate-500 mt-1">Bogføring</p>
           </div>
-          <p className="text-sm text-slate-600 text-center">{user.afdeling_navn || user.username}</p>
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-slate-600">{user.afdeling_navn || user.username}</p>
+            <Button
+              onClick={handleLogout}
+              variant="ghost"
+              size="sm"
+              data-testid="logout-button"
+              className="text-slate-500 hover:bg-slate-100 hover:text-red-600 p-2"
+              title="Log ud"
+            >
+              <LogOut size={18} />
+            </Button>
+          </div>
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {navItems.map((item) => {
@@ -105,11 +117,12 @@ export default function Layout({ user, setUser }) {
             );
           })}
         </nav>
-        <div className="p-4 border-t border-slate-200">
+        {/* Mobile logout button at bottom */}
+        <div className="p-4 border-t border-slate-200 lg:hidden">
           <Button
             onClick={handleLogout}
             variant="ghost"
-            data-testid="logout-button"
+            data-testid="logout-button-mobile"
             className="w-full justify-start text-slate-700 hover:bg-slate-100 hover:text-slate-900"
           >
             <LogOut size={20} className="mr-3" />
