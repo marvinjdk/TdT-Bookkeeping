@@ -118,6 +118,11 @@ export default function TransactionsPage({ user }) {
       let url = '/transactions';
       const params = new URLSearchParams();
       
+      // Add regnskabsaar filter
+      if (selectedRegnskabsaar) {
+        params.append('regnskabsaar', selectedRegnskabsaar);
+      }
+      
       if (isAdmin) {
         // Find the user_id for the selected afdeling
         if (selectedAfdelingFilter && selectedAfdelingFilter !== 'all') {
