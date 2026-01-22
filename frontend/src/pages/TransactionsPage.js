@@ -211,18 +211,40 @@ export default function TransactionsPage({ user }) {
               ? (selectedAfdelingFilter !== 'all' ? `Posteringer for ${selectedAfdelingFilter}` : 'Alle posteringer')
               : 'Administrer dine bogføringsposteringer'
             }
+            {selectedRegnskabsaar && ` (${selectedRegnskabsaar})`}
           </p>
         </div>
-        {!isAdmin && (
-          <Button
-            onClick={() => navigate('/transactions/new')}
-            data-testid="new-transaction-button"
-            className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95 w-full sm:w-auto"
-          >
-            <Plus size={18} className="mr-2" />
-            Ny postering
-          </Button>
-        )}
+        <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+          {/* Regnskabsår selector */}
+          {regnskabsaarList.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-slate-500" />
+              <Select value={selectedRegnskabsaar} onValueChange={setSelectedRegnskabsaar}>
+                <SelectTrigger className="w-[160px] bg-white border-slate-200" data-testid="regnskabsaar-select">
+                  <SelectValue placeholder="Vælg år" />
+                </SelectTrigger>
+                <SelectContent>
+                  {regnskabsaarList.map((year) => (
+                    <SelectItem key={year} value={year}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          
+          {!isAdmin && (
+            <Button
+              onClick={() => navigate('/transactions/new')}
+              data-testid="new-transaction-button"
+              className="bg-[#109848] hover:bg-[#0d7a3a] text-white shadow-sm transition-all active:scale-95 w-full sm:w-auto"
+            >
+              <Plus size={18} className="mr-2" />
+              Ny postering
+            </Button>
+          )}
+        </div>
       </div>
 
       <Card className="bg-white border border-slate-100 shadow-sm">
