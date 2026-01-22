@@ -234,6 +234,21 @@ frontend:
           agent: "testing"
           comment: "❌ PARTIAL ISSUE: Department dropdown shows all 8 options correctly (Alle hold + 7 departments). However, when selecting 'Alle hold' from dropdown, the URL doesn't update correctly and Hold column visibility logic has issues. The dropdown selection works but URL parameter handling and Hold column display need fixes."
 
+  - task: "Department User Regnskabsår Access"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/DashboardPage.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "NEW TASK: Testing regnskabsår dropdown functionality for department users (himmerland/test123) as specified in review request."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL ISSUE: Department users cannot access regnskabsår dropdown functionality. GET /api/historik/regnskabsaar returns 403 Forbidden error for department users. Console shows 'Kunne ikke hente regnskabsår' (Could not fetch regnskabsår). This prevents department users from viewing historical data across different accounting years. Frontend code is correct - the issue is backend permission restriction. Admin users have full access, but department users are blocked from historical data viewing."
+
   - task: "Browser Title"
     implemented: true
     working: true
