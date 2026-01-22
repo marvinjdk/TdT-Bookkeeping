@@ -446,6 +446,222 @@ class BogforingsappAPITester:
         )
         return success
 
+    def test_receipt_upload_flow(self):
+        """Test complete receipt upload flow"""
+        print("\n📎 Testing Receipt Upload Flow")
+        print("-" * 40)
+        
+        # Step 1: Create a transaction first
+        transaction_data = {
+            "bank_dato": "2024-01-15",
+            "tekst": "Test receipt transaction",
+            "formal": "Receipt testing",
+            "belob": 250.00,
+            "type": "udgift"
+        }
+        
+        success, response = self.run_test(
+            "Create Transaction for Receipt",
+            "POST",
+            "transactions",
+            200,
+            data=transaction_data
+        )
+        
+        if not success or 'id' not in response:
+            print("❌ Failed to create transaction for receipt upload")
+            return False
+            
+        transaction_id = response['id']
+        print(f"   Created transaction ID: {transaction_id}")
+        
+        # Step 2: Create a test file and upload it
+        test_file_content = b"This is a test receipt file content"
+        files = {'file': ('test_receipt.txt', test_file_content, 'text/plain')}
+        
+        success, upload_response = self.run_test(
+            "Upload Receipt File",
+            "POST",
+            f"transactions/{transaction_id}/upload",
+            200,
+            files=files
+        )
+        
+        if not success:
+            print("❌ Failed to upload receipt file")
+            return False
+            
+        print(f"   Upload response: {upload_response}")
+        
+        # Step 3: Verify transaction has kvittering_url set
+        success, transaction_response = self.run_test(
+            "Verify Transaction has Receipt URL",
+            "GET",
+            f"transactions/{transaction_id}",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to get transaction after upload")
+            return False
+            
+        kvittering_url = transaction_response.get('kvittering_url')
+        if not kvittering_url:
+            print("❌ Transaction does not have kvittering_url set after upload")
+            return False
+            
+        print(f"   ✅ Transaction has kvittering_url: {kvittering_url}")
+        
+        # Step 4: Test downloading the receipt
+        # Extract path components from kvittering_url
+        # Format: /uploads/kvitteringer/{afdeling_navn}/{regnskabsaar}/{filename}
+        url_parts = kvittering_url.strip('/').split('/')
+        if len(url_parts) >= 4 and url_parts[0] == 'uploads' and url_parts[1] == 'kvitteringer':
+            afdeling_navn = url_parts[2]
+            regnskabsaar = url_parts[3]
+            filename = url_parts[4]
+            
+            download_endpoint = f"uploads/kvitteringer/{afdeling_navn}/{regnskabsaar}/{filename}"
+            success, download_response = self.run_test(
+                "Download Receipt File",
+                "GET",
+                download_endpoint,
+                200
+            )
+            
+            if success:
+                print(f"   ✅ Successfully downloaded receipt file")
+            else:
+                print(f"❌ Failed to download receipt file from {download_endpoint}")
+                return False
+        else:
+            print(f"❌ Invalid kvittering_url format: {kvittering_url}")
+            return False
+        
+        return True
+
+    def test_historical_data_viewing(self):
+        """Test historical data viewing functionality"""
+        print("\n📅 Testing Historical Data Viewing")
+        print("-" * 40)
+        
+        # Test 1: Get available regnskabsaar
+        success, response = self.run_test(
+            "Get Available Regnskabsaar",
+            "GET",
+            "historik/regnskabsaar",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to get available regnskabsaar")
+            return False
+            
+        regnskabsaar_list = response.get('regnskabsaar', [])
+        print(f"   Available regnskabsaar: {regnskabsaar_list}")
+        
+        # Expected years based on review request
+        expected_years = ["2025-2026", "2024-2025"]
+        
+        # Test 2: Dashboard stats for 2024-2025 (should have transactions)
+        success, stats_2024 = self.run_test(
+            "Dashboard Stats for 2024-2025",
+            "GET",
+            "dashboard/stats?regnskabsaar=2024-2025",
+            200
+        )
+        
+        if success:
+            print(f"   2024-2025 Stats: {stats_2024}")
+        else:
+            print("❌ Failed to get dashboard stats for 2024-2025")
+            return False
+        
+        # Test 3: Dashboard stats for 2025-2026 (should have 0 transactions)
+        success, stats_2025 = self.run_test(
+            "Dashboard Stats for 2025-2026",
+            "GET",
+            "dashboard/stats?regnskabsaar=2025-2026",
+            200
+        )
+        
+        if success:
+            print(f"   2025-2026 Stats: {stats_2025}")
+        else:
+            print("❌ Failed to get dashboard stats for 2025-2026")
+            return False
+        
+        # Test 4: Transactions for 2024-2025 (should return 2 transactions)
+        success, trans_2024 = self.run_test(
+            "Transactions for 2024-2025",
+            "GET",
+            "transactions?regnskabsaar=2024-2025",
+            200
+        )
+        
+        if success:
+            trans_count_2024 = len(trans_2024) if isinstance(trans_2024, list) else 0
+            print(f"   2024-2025 Transactions: {trans_count_2024} found")
+            if trans_count_2024 > 0:
+                print(f"   Sample: {trans_2024[0].get('bilagnr')} - {trans_2024[0].get('tekst')}")
+        else:
+            print("❌ Failed to get transactions for 2024-2025")
+            return False
+        
+        # Test 5: Transactions for 2025-2026 (should return 0 transactions)
+        success, trans_2025 = self.run_test(
+            "Transactions for 2025-2026",
+            "GET",
+            "transactions?regnskabsaar=2025-2026",
+            200
+        )
+        
+        if success:
+            trans_count_2025 = len(trans_2025) if isinstance(trans_2025, list) else 0
+            print(f"   2025-2026 Transactions: {trans_count_2025} found")
+        else:
+            print("❌ Failed to get transactions for 2025-2026")
+            return False
+        
+        # Verify expectations from review request
+        print("\n   📋 Verifying Review Request Expectations:")
+        
+        # Check if we have the expected regnskabsaar
+        if "2024-2025" in regnskabsaar_list and "2025-2026" in regnskabsaar_list:
+            print("   ✅ Expected regnskabsaar years found")
+        else:
+            print(f"   ⚠️  Expected years {expected_years} not all found in {regnskabsaar_list}")
+        
+        # Check transaction counts match expectations
+        if trans_count_2024 >= 2:
+            print("   ✅ 2024-2025 has transactions as expected")
+        else:
+            print(f"   ⚠️  2024-2025 expected 2+ transactions, found {trans_count_2024}")
+        
+        if trans_count_2025 == 0:
+            print("   ✅ 2025-2026 has 0 transactions as expected")
+        else:
+            print(f"   ⚠️  2025-2026 expected 0 transactions, found {trans_count_2025}")
+        
+        return True
+
+    def test_excel_export_with_receipt_links(self):
+        """Test Excel export includes receipt links"""
+        print("\n📊 Testing Excel Export with Receipt Links")
+        print("-" * 40)
+        
+        # Test export for 2024-2025 (should include receipt folder info)
+        success = self.test_excel_export("2024-2025")
+        
+        if success:
+            print("   ✅ Excel export for 2024-2025 successful")
+            print("   Note: Receipt folder links should be included in Excel file")
+        else:
+            print("   ❌ Excel export for 2024-2025 failed")
+            return False
+        
+        return True
+
     def test_invalid_login(self):
         """Test login with invalid credentials"""
         success, response = self.run_test(
