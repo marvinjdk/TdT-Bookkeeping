@@ -35,7 +35,7 @@ export default function LoginPage({ setUser }) {
     <div
       className="min-h-screen flex items-center justify-center p-6"
       style={{
-        backgroundImage: 'url(https://images.unsplash.com/photo-1621398945308-8bbe2fe60eb4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzF8MHwxfHNlYXJjaHwyfHxkYW5pc2glMjBuYXR1cmUlMjBsYW5kc2NhcGUlMjBtaW5pbWFsaXN0fGVufDB8fHx8MTc2NTI3MDkxMnww&ixlib=rb-4.1.0&q=85)',
+        backgroundImage: 'url(https://customer-assets.emergentagent.com/job_66848c11-2e13-4052-b5cb-0c5f89302765/artifacts/harxg1va_Tdt%20felt%20i%20Paris%202025.jpeg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
