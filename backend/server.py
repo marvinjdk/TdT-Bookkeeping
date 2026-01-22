@@ -322,7 +322,20 @@ async def get_available_regnskabsaar(current_user: User = Depends(get_current_us
     results = await db.settings.aggregate(pipeline).to_list(None)
     regnskabsaar_list = [r["_id"] for r in results if r["_id"]]
     
-    return {"regnskabsaar": regnskabsaar_list}
+    # Determine current regnskabsår based on today's date
+    # Regnskabsår runs from October 1 to September 30
+    today = datetime.now(timezone.utc)
+    if today.month >= 10:  # October onwards = new year starts
+        current_year = f"{today.year}-{today.year + 1}"
+    else:  # January-September = still in previous year's period
+        current_year = f"{today.year - 1}-{today.year}"
+    
+    # Sort so current year is first, then others in descending order
+    if current_year in regnskabsaar_list:
+        regnskabsaar_list.remove(current_year)
+        regnskabsaar_list.insert(0, current_year)
+    
+    return {"regnskabsaar": regnskabsaar_list, "current": current_year}
 
 @api_router.get("/admin/settings/all")
 async def get_all_settings(current_user: User = Depends(get_current_user)):
