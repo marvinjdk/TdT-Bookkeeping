@@ -1158,7 +1158,10 @@ async def export_excel(
         )
 
 async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn, regnskabsaar=None):
-    """Create a sheet for a specific afdeling with startsaldo and aktuel saldo"""
+    """Create a sheet for a specific afdeling with startsaldo and aktuel saldo.
+    Returns list of receipt files for this afdeling."""
+    receipt_files = []
+    
     # Clean sheet name - remove invalid characters and limit to 31 chars
     clean_name = afdeling_navn.replace("/", "-").replace("\\", "-").replace("[", "").replace("]", "")
     clean_name = clean_name.replace("*", "").replace("?", "").replace(":", "")[:31]
@@ -1173,12 +1176,32 @@ async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn, regnskabsaar=Non
     if regnskabsaar:
         query["regnskabsaar"] = regnskabsaar
     
-    # Get transactions
+    # Get transactions with receipt info
     projection = {
         "_id": 0, "bilagnr": 1, "bank_dato": 1, 
-        "tekst": 1, "formal": 1, "belob": 1, "type": 1
+        "tekst": 1, "formal": 1, "belob": 1, "type": 1,
+        "kvittering_url": 1, "kvittering_filename": 1
     }
     transactions = await db.transactions.find(query, projection).sort("bank_dato", 1).to_list(10000)
+    
+    # Collect receipt files
+    kvit_regnskabsaar = regnskabsaar if regnskabsaar else (settings.get("regnskabsaar", "2024-2025") if settings else "2024-2025")
+    for t in transactions:
+        if t.get("kvittering_url"):
+            # Extract filename from URL like /api/uploads/kvitteringer/Afdeling/2024-2025/filename.pdf
+            try:
+                url_parts = t["kvittering_url"].split("/")
+                filename = url_parts[-1] if url_parts else None
+                if filename:
+                    file_path = Path(f"/app/uploads/kvitteringer/{afdeling_navn}/{kvit_regnskabsaar}/{filename}")
+                    if file_path.exists():
+                        receipt_files.append({
+                            "path": str(file_path),
+                            "afdeling": afdeling_navn,
+                            "bilagnr": t.get("bilagnr", "unknown")
+                        })
+            except Exception as e:
+                logger.warning(f"Could not process receipt file: {e}")
     
     # Calculate sums
     total_indtaegter = sum(t["belob"] for t in transactions if t["type"] == "indtaegt")
@@ -1191,8 +1214,7 @@ async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn, regnskabsaar=Non
     ws[1][4].font = Font(bold=True)
     
     # Add kvitteringer folder info
-    kvit_regnskabsaar = regnskabsaar if regnskabsaar else (settings.get("regnskabsaar", "2024-2025") if settings else "2024-2025")
-    kvit_folder_path = f"/app/uploads/kvitteringer/{afdeling_navn}/{kvit_regnskabsaar}"
+    kvit_folder_path = f"kvitteringer/{afdeling_navn}/"
     ws.append(["Kvitteringer mappe:", kvit_folder_path, "", "", "", ""])
     ws[2][0].font = Font(bold=True, color="0066CC")
     ws[2][1].font = Font(color="0066CC")
@@ -1200,8 +1222,8 @@ async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn, regnskabsaar=Non
     # Add empty row
     ws.append([])
     
-    # Headers
-    headers = ["Bilagnr.", "Bank dato", "Tekst", "Formål", "Beløb", "Type"]
+    # Headers - added "Kvittering" column
+    headers = ["Bilagnr.", "Bank dato", "Tekst", "Formål", "Beløb", "Type", "Kvittering"]
     ws.append(headers)
     
     # Style headers
@@ -1213,15 +1235,22 @@ async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn, regnskabsaar=Non
         cell.font = header_font
         cell.alignment = Alignment(horizontal="center")
     
-    # Add data
+    # Add data with receipt filename
     for t in transactions:
+        receipt_name = ""
+        if t.get("kvittering_url"):
+            try:
+                receipt_name = t["kvittering_url"].split("/")[-1]
+            except:
+                pass
         ws.append([
             t["bilagnr"],
             t["bank_dato"],
             t["tekst"],
             t["formal"],
             t["belob"],
-            t["type"]
+            t["type"],
+            receipt_name
         ])
     
     # Add empty row
@@ -1229,11 +1258,13 @@ async def create_afdeling_sheet(wb, afdeling_id, afdeling_navn, regnskabsaar=Non
     
     # Add aktuel saldo row
     last_row = ws.max_row + 1
-    ws.append(["Aktuel saldo", "", "", "", aktuel_saldo, ""])
+    ws.append(["Aktuel saldo", "", "", "", aktuel_saldo, "", ""])
     ws[last_row][0].font = Font(bold=True, color="109848")
     ws[last_row][4].font = Font(bold=True, color="109848")
     
     auto_adjust_columns(ws)
+    
+    return receipt_files
 
 def auto_adjust_columns(ws):
     """Auto-adjust column widths"""
