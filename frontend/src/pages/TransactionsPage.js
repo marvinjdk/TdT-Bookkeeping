@@ -391,6 +391,23 @@ export default function TransactionsPage({ user }) {
               </SelectContent>
             </Select>
           </div>
+          
+          {/* Checkbox for missing receipts */}
+          <div className="flex items-center space-x-2 mt-4 pt-4 border-t border-slate-100">
+            <Checkbox 
+              id="missing-receipts" 
+              checked={showMissingReceipts}
+              onCheckedChange={setShowMissingReceipts}
+              className="border-slate-300 data-[state=checked]:bg-[#109848] data-[state=checked]:border-[#109848]"
+            />
+            <Label 
+              htmlFor="missing-receipts" 
+              className="text-sm font-medium text-slate-700 cursor-pointer flex items-center gap-2"
+            >
+              <FileX size={16} className="text-orange-500" />
+              Vis kun posteringer uden bilag
+            </Label>
+          </div>
         </CardContent>
       </Card>
 
