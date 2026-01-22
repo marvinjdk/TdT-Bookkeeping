@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Edit, Trash2, Search, FileImage, Users } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, FileImage, Users, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatCurrencyWithUnit } from '@/utils/formatNumber';
 
@@ -34,6 +34,8 @@ export default function TransactionsPage({ user }) {
   const [afdelinger, setAfdelinger] = useState([]);
   const [afdelingerMap, setAfdelingerMap] = useState({});
   const [selectedAfdelingFilter, setSelectedAfdelingFilter] = useState('all');
+  const [regnskabsaarList, setRegnskabsaarList] = useState([]);
+  const [selectedRegnskabsaar, setSelectedRegnskabsaar] = useState('');
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   
@@ -44,18 +46,34 @@ export default function TransactionsPage({ user }) {
   const urlAfdelingNavn = searchParams.get('afdeling_navn');
 
   useEffect(() => {
+    fetchRegnskabsaar();
     if (isAdmin) {
       fetchAfdelinger();
-    } else {
-      fetchTransactions();
     }
   }, [isAdmin]);
 
   useEffect(() => {
-    if (isAdmin && afdelinger.length > 0) {
-      fetchTransactions();
+    if (selectedRegnskabsaar) {
+      if (isAdmin && afdelinger.length > 0) {
+        fetchTransactions();
+      } else if (!isAdmin) {
+        fetchTransactions();
+      }
     }
-  }, [afdelinger, urlAfdelingId, urlAfdelingNavn, selectedAfdelingFilter]);
+  }, [afdelinger, urlAfdelingId, urlAfdelingNavn, selectedAfdelingFilter, selectedRegnskabsaar, isAdmin]);
+
+  const fetchRegnskabsaar = async () => {
+    try {
+      const res = await api.get('/historik/regnskabsaar');
+      const years = res.data.regnskabsaar || [];
+      setRegnskabsaarList(years);
+      if (years.length > 0) {
+        setSelectedRegnskabsaar(years[0]); // Default to most recent
+      }
+    } catch (error) {
+      console.error('Kunne ikke hente regnskabsår');
+    }
+  };
 
   useEffect(() => {
     applyFilters();
