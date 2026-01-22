@@ -97,7 +97,7 @@ export default function TransactionsPage({ user }) {
 
   useEffect(() => {
     applyFilters();
-  }, [transactions, searchTerm, typeFilter, formalFilter, sortColumn, sortDirection]);
+  }, [transactions, searchTerm, typeFilter, formalFilter, sortColumn, sortDirection, showMissingReceipts]);
 
   const fetchAfdelinger = async () => {
     try {
