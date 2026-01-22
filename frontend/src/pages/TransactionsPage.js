@@ -398,12 +398,72 @@ export default function TransactionsPage({ user }) {
                     {isAdmin && selectedAfdelingFilter === 'all' && (
                       <TableHead className="font-semibold text-slate-700">Hold</TableHead>
                     )}
-                    <TableHead className="font-semibold text-slate-700">Bilagnr.</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Bank dato</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Tekst</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Formål</TableHead>
-                    <TableHead className="font-semibold text-slate-700 text-right">Beløb</TableHead>
-                    <TableHead className="font-semibold text-slate-700 text-center">Type</TableHead>
+                    <TableHead 
+                      className="font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 select-none"
+                      onClick={() => handleSort('bilagnr')}
+                    >
+                      <div className="flex items-center gap-1">
+                        Bilagnr.
+                        {sortColumn === 'bilagnr' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
+                        ) : <ArrowUpDown size={14} className="text-slate-400" />}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 select-none"
+                      onClick={() => handleSort('bank_dato')}
+                    >
+                      <div className="flex items-center gap-1">
+                        Bank dato
+                        {sortColumn === 'bank_dato' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
+                        ) : <ArrowUpDown size={14} className="text-slate-400" />}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 select-none"
+                      onClick={() => handleSort('tekst')}
+                    >
+                      <div className="flex items-center gap-1">
+                        Tekst
+                        {sortColumn === 'tekst' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
+                        ) : <ArrowUpDown size={14} className="text-slate-400" />}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 select-none"
+                      onClick={() => handleSort('formal')}
+                    >
+                      <div className="flex items-center gap-1">
+                        Formål
+                        {sortColumn === 'formal' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
+                        ) : <ArrowUpDown size={14} className="text-slate-400" />}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="font-semibold text-slate-700 text-right cursor-pointer hover:bg-slate-100 select-none"
+                      onClick={() => handleSort('belob')}
+                    >
+                      <div className="flex items-center justify-end gap-1">
+                        Beløb
+                        {sortColumn === 'belob' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
+                        ) : <ArrowUpDown size={14} className="text-slate-400" />}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="font-semibold text-slate-700 text-center cursor-pointer hover:bg-slate-100 select-none"
+                      onClick={() => handleSort('type')}
+                    >
+                      <div className="flex items-center justify-center gap-1">
+                        Type
+                        {sortColumn === 'type' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
+                        ) : <ArrowUpDown size={14} className="text-slate-400" />}
+                      </div>
+                    </TableHead>
                     <TableHead className="font-semibold text-slate-700 text-center">Kvit.</TableHead>
                     {!isAdmin && (
                       <TableHead className="font-semibold text-slate-700 text-right">Handlinger</TableHead>
@@ -425,7 +485,7 @@ export default function TransactionsPage({ user }) {
                         </TableCell>
                       )}
                       <TableCell className="font-mono text-slate-800">{transaction.bilagnr}</TableCell>
-                      <TableCell className="text-slate-600">{transaction.bank_dato}</TableCell>
+                      <TableCell className="text-slate-600">{formatDate(transaction.bank_dato)}</TableCell>
                       <TableCell className="max-w-[200px] truncate text-slate-700" title={transaction.tekst}>
                         {transaction.tekst}
                       </TableCell>
