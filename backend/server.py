@@ -312,10 +312,7 @@ async def delete_afdeling(afdeling_id: str, current_user: User = Depends(get_cur
 # Historiske data endpoints
 @api_router.get("/historik/regnskabsaar")
 async def get_available_regnskabsaar(current_user: User = Depends(get_current_user)):
-    """Get list of available regnskabsår for filtering historical data (admin only)"""
-    if current_user.role not in ["admin", "superbruger"]:
-        raise HTTPException(status_code=403, detail="Kun admins kan se historiske data")
-    
+    """Get list of available regnskabsår for filtering historical data"""
     # Get unique regnskabsår from settings
     pipeline = [
         {"$group": {"_id": "$regnskabsaar"}},
