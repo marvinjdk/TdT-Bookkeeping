@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Trash2, Eye, Settings, Key, Edit2 } from 'lucide-react';
+import { Plus, Trash2, Eye, Settings, Key, Edit2, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { formatCurrencyWithUnit, formatCurrency } from '@/utils/formatNumber';
@@ -25,6 +25,8 @@ export default function AdminPage({ user }) {
   const [newPassword, setNewPassword] = useState('');
   const [newAfdelingNavn, setNewAfdelingNavn] = useState('');
   const [newAfdelingCreate, setNewAfdelingCreate] = useState('');
+  const [regnskabsaarList, setRegnskabsaarList] = useState([]);
+  const [selectedRegnskabsaar, setSelectedRegnskabsaar] = useState('');
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -39,12 +41,33 @@ export default function AdminPage({ user }) {
   useEffect(() => {
     fetchUsers();
     fetchAfdelinger();
-    fetchAllAfdelingerStats();
+    fetchRegnskabsaar();
   }, []);
 
-  const fetchAllAfdelingerStats = async () => {
+  useEffect(() => {
+    if (selectedRegnskabsaar) {
+      fetchAllAfdelingerStats(selectedRegnskabsaar);
+    }
+  }, [selectedRegnskabsaar]);
+
+  const fetchRegnskabsaar = async () => {
     try {
-      const res = await api.get('/dashboard/stats');
+      const res = await api.get('/historik/regnskabsaar');
+      const years = res.data.regnskabsaar || [];
+      setRegnskabsaarList(years);
+      if (years.length > 0) {
+        setSelectedRegnskabsaar(years[0]); // Default to most recent
+      }
+    } catch (error) {
+      console.error('Kunne ikke hente regnskabsår');
+      fetchAllAfdelingerStats();
+    }
+  };
+
+  const fetchAllAfdelingerStats = async (regnskabsaar = null) => {
+    try {
+      const params = regnskabsaar ? `?regnskabsaar=${regnskabsaar}` : '';
+      const res = await api.get(`/dashboard/stats${params}`);
       setAllAfdelingerStats(res.data);
     } catch (error) {
       console.error('Kunne ikke hente samlet statistik');
