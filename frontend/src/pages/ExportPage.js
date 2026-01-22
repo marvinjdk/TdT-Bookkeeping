@@ -176,7 +176,7 @@ export default function ExportPage({ user }) {
             {loading ? 'Eksporterer...' : (
               <>
                 <Download size={18} className="mr-2" />
-                Download Excel
+                Download Excel + Kvitteringer
               </>
             )}
           </Button>
