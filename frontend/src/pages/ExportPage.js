@@ -157,6 +157,7 @@ export default function ExportPage({ user }) {
               <li>Startsaldo i øverste række</li>
               <li>Alle posteringer sorteret efter bank dato</li>
               <li>Aktuel saldo beregnet (startsaldo + indtægter - udgifter)</li>
+              <li className="text-blue-700 font-medium">Alle kvitteringsfiler (downloades som ZIP)</li>
               {user.role === 'admin' && selectedAfdeling === 'all' && (
                 <>
                   <li>Separate faneblade per hold</li>
