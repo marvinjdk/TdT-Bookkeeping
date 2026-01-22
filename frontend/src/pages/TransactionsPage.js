@@ -53,6 +53,7 @@ export default function TransactionsPage({ user }) {
   const [selectedRegnskabsaar, setSelectedRegnskabsaar] = useState('');
   const [sortColumn, setSortColumn] = useState('bilagnr');
   const [sortDirection, setSortDirection] = useState('asc');
+  const [showMissingReceipts, setShowMissingReceipts] = useState(false);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   
