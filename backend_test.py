@@ -674,7 +674,7 @@ class BogforingsappAPITester:
         return success
 
 def main():
-    print("🚀 Starting Bogføringsapp API Tests")
+    print("🚀 Starting Tour de Taxa Bookkeeping API Tests")
     print("=" * 50)
     
     tester = BogforingsappAPITester()
@@ -682,30 +682,33 @@ def main():
     # Test invalid login first
     tester.test_invalid_login()
     
-    # Test with afdeling user
-    print("\n📋 Testing with Afdeling User (himmerland)")
+    # Test with afdeling user (himmerland/test123)
+    print("\n📋 Testing with Department User (himmerland/test123)")
     print("-" * 40)
     
     if not tester.test_login_afdeling():
-        print("❌ Afdeling login failed, stopping afdeling tests")
+        print("❌ Department login failed, stopping department tests")
     else:
         tester.test_get_me()
         tester.test_dashboard_stats()
+        
+        # Test Scenario 1: Receipt Upload Flow (P2)
+        tester.test_receipt_upload_flow()
+        
         tester.test_create_transaction()
         tester.test_list_transactions()
         tester.test_get_transaction()
         tester.test_update_transaction()
         tester.test_settings_get()
         tester.test_settings_update()
-        tester.test_excel_export()
         tester.test_delete_transaction()
     
     # Reset for admin tests
     tester.token = None
     tester.current_user = None
     
-    # Test with admin user
-    print("\n👑 Testing with Admin User")
+    # Test with admin user (admin/admin123)
+    print("\n👑 Testing with Admin User (admin/admin123)")
     print("-" * 40)
     
     if not tester.test_login_admin():
@@ -713,12 +716,18 @@ def main():
     else:
         tester.test_get_me()
         tester.test_dashboard_stats()
+        
+        # Test Scenario 2: Historical Data Viewing (P1)
+        tester.test_historical_data_viewing()
+        
+        # Test Excel export with receipt links
+        tester.test_excel_export_with_receipt_links()
+        
         tester.test_admin_dashboard_stats_with_afdelinger_saldi()
         tester.test_admin_transactions_by_afdeling_id()
         tester.test_admin_transactions_all_departments()
         tester.test_admin_list_users()
         tester.test_admin_create_user()
-        tester.test_excel_export()
 
     # Print final results
     print("\n" + "=" * 50)
