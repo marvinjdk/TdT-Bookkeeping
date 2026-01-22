@@ -52,10 +52,11 @@ export default function DashboardPage({ user }) {
     try {
       const res = await api.get('/historik/regnskabsaar');
       const years = res.data.regnskabsaar || [];
+      const currentYear = res.data.current;
       setRegnskabsaarList(years);
       if (years.length > 0) {
-        // Default to second item (current year) if available, otherwise first
-        setSelectedRegnskabsaar(years.length > 1 ? years[1] : years[0]);
+        // Use the current year from backend, or first in list
+        setSelectedRegnskabsaar(currentYear && years.includes(currentYear) ? currentYear : years[0]);
       }
     } catch (error) {
       console.error('Kunne ikke hente regnskabsår');
