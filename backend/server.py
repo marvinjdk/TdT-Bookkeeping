@@ -325,10 +325,11 @@ async def get_available_regnskabsaar(current_user: User = Depends(get_current_us
     
     # Determine current regnskabsår based on today's date
     # Regnskabsår runs from October 1 to September 30
+    # So October 2024 - September 2025 = "2024-2025"
     today = datetime.now(timezone.utc)
-    if today.month >= 10:  # October onwards = new year starts
+    if today.month >= 10:  # October-December = new period started
         current_year = f"{today.year}-{today.year + 1}"
-    else:  # January-September = still in previous year's period
+    else:  # January-September = still in period that started last October
         current_year = f"{today.year - 1}-{today.year}"
     
     # Sort so current year is first, then others in descending order
