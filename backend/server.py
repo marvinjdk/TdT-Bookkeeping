@@ -573,6 +573,31 @@ async def upload_receipt(
     
     return {"success": True, "url": kvittering_url, "filename": safe_filename}
 
+@api_router.get("/kvittering/{regnskabsaar}/{afdeling}/{filename}")
+async def download_receipt_alt(
+    regnskabsaar: str,
+    afdeling: str,
+    filename: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Download a receipt file - alternative endpoint format"""
+    file_path = Path(f"/app/uploads/kvitteringer/{afdeling}/{regnskabsaar}/{filename}")
+    
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Fil ikke fundet")
+    
+    # Check permissions
+    if current_user.role == "afdeling":
+        if current_user.afdeling_navn != afdeling:
+            raise HTTPException(status_code=403, detail="Ingen adgang")
+    
+    from fastapi.responses import FileResponse
+    return FileResponse(
+        path=file_path,
+        filename=filename,
+        media_type="application/octet-stream"
+    )
+
 @api_router.get("/uploads/kvitteringer/{afdeling_navn}/{regnskabsaar}/{filename}")
 async def download_receipt(
     afdeling_navn: str,
