@@ -68,7 +68,8 @@ export default function TransactionsPage({ user }) {
       const years = res.data.regnskabsaar || [];
       setRegnskabsaarList(years);
       if (years.length > 0) {
-        setSelectedRegnskabsaar(years[0]); // Default to most recent
+        // Default to second item (current year) if available, otherwise first
+        setSelectedRegnskabsaar(years.length > 1 ? years[1] : years[0]);
       }
     } catch (error) {
       console.error('Kunne ikke hente regnskabsår');
