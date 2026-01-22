@@ -345,8 +345,6 @@ export default function DashboardPage({ user }) {
       </div>
     );
   }
-
-  const isAdmin = user.role === 'admin' || user.role === 'superbruger';
   
   const statCards = isAdmin ? [
     {
