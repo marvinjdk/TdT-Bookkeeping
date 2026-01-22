@@ -512,7 +512,7 @@ class BogforingsappAPITester:
             
         print(f"   ✅ Transaction has kvittering_url: {kvittering_url}")
         
-        # Step 4: Test downloading the receipt
+        # Step 4: Test downloading the receipt using both endpoint formats
         # Extract path components from kvittering_url
         # Format: /uploads/kvitteringer/{afdeling_navn}/{regnskabsaar}/{filename}
         url_parts = kvittering_url.strip('/').split('/')
@@ -521,18 +521,32 @@ class BogforingsappAPITester:
             regnskabsaar = url_parts[3]
             filename = url_parts[4]
             
+            # Test original endpoint format
             download_endpoint = f"uploads/kvitteringer/{afdeling_navn}/{regnskabsaar}/{filename}"
             success, download_response = self.run_test(
-                "Download Receipt File",
+                "Download Receipt File (Original Format)",
                 "GET",
                 download_endpoint,
                 200
             )
             
-            if success:
-                print(f"   ✅ Successfully downloaded receipt file")
-            else:
+            if not success:
                 print(f"❌ Failed to download receipt file from {download_endpoint}")
+                return False
+            
+            # Test review request endpoint format: /api/kvittering/{regnskabsaar}/{afdeling}/{filename}
+            alt_download_endpoint = f"kvittering/{regnskabsaar}/{afdeling_navn}/{filename}"
+            success, alt_download_response = self.run_test(
+                "Download Receipt File (Review Request Format)",
+                "GET",
+                alt_download_endpoint,
+                200
+            )
+            
+            if success:
+                print(f"   ✅ Successfully downloaded receipt file using both endpoint formats")
+            else:
+                print(f"❌ Failed to download receipt file from alternative endpoint {alt_download_endpoint}")
                 return False
         else:
             print(f"❌ Invalid kvittering_url format: {kvittering_url}")
